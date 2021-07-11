@@ -1,10 +1,13 @@
+#[path = "linear_algebra/vector.rs"]
+mod vector;
+
 fn main() {
     println!("Hello, world!");
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test() {
