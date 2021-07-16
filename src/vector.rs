@@ -14,8 +14,40 @@ impl Vector {
         Self { vec }
     }
 
+    /// this returns the [`cross product`]
+    ///
+    /// [`cross product`]: https://en.wikipedia.org/wiki/Cross_product
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// let vector1 = Vector::new(vec![1., 0., 0.]);
+    /// let vector2 = Vector::new(vec![0., 1., 0.]);
+    /// assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
+    /// ```  
+    /// note this only works with 3 dimensional vectors
     pub fn cross_vec(&self, other: &Vector) -> Vector {
-        todo!();
+        if self.len() != 3 || other.len() != 3 {
+            panic!("this only works with 3 dimensional vectors");
+        }
+
+        Vector::new(vec![
+            self.index(1) * other.index(2) - self.index(2) * other.index(1),
+            self.index(2) * other.index(0) - self.index(0) * other.index(2),
+            self.index(0) * other.index(1) - self.index(1) * other.index(0),
+        ])
+    }
+
+    /// returns the value at the given index
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// let vector = Vector::new(vec![1., 3., 6.]);
+    /// assert_eq!(vector.index(1), 3.);
+    /// ```  
+    pub fn index(&self, index: usize) -> f32 {
+        self.vec()[index]
     }
 
     /// returns the angle in degrees between the 2 vectors
@@ -121,7 +153,7 @@ impl Vector {
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
     /// vector1.mul_vec(vector2);
-    /// assert_eq!(vector1, Vector::new(vec![(0. * 3.), (2. * 1.), (3. * 3.)]));
+    /// assert_eq!(vector1, Vector::new(vec![0. * 3., 2. * 1., 3. * 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn mul_vec(&mut self, other: &Vector) {
@@ -147,8 +179,8 @@ impl Vector {
     /// ```rust
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
-    /// vector1.mul_vec(vector2);
-    /// assert_eq!(vector1, Vector::new(vec![(0. + 3.), (2. + 1.), (3. + 3.)]));
+    /// vector1.mul_vec(&vector2);
+    /// assert_eq!(vector1, Vector::new(vec![0. + 3., 2. + 1., 3. + 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn add_vec(&mut self, other: &Vector) {
@@ -174,8 +206,8 @@ impl Vector {
     /// ```rust
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
-    /// vector1.mul_vec(vector2);
-    /// assert_eq!(vector1, Vector::new(vec![(0. - 3.), (2. - 1.), (3. - 3.)]));
+    /// vector1.mul_vec(&vector2);
+    /// assert_eq!(vector1, Vector::new(vec![0. - 3., 2. - 1., 3. - 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn sub_vec(&mut self, other: &Vector) {
@@ -201,8 +233,8 @@ impl Vector {
     /// ```rust
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
-    /// vector1.div_vec(vector2);
-    /// assert_eq!(vector1, Vector::new(vec![(0. / 3.), (2. / 1.), (3. / 3.)]));
+    /// vector1.div_vec(&vector2);
+    /// assert_eq!(vector1, Vector::new(vec![0. / 3., 2. / 1., 3. / 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn div_vec(&mut self, other: &Vector) {
@@ -227,8 +259,8 @@ impl Vector {
     ///
     /// ```rust
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
-    /// vector.mul_scalar(2.);
-    /// assert_eq!(vector, Vector::new(vec![(2. * 2.), (3. * 2.), (5. * 2.)]));
+    /// vector.mul_scalar(&2.);
+    /// assert_eq!(vector, Vector::new(vec![2. * 2., 3. * 2., 5. * 2.]));
     /// ```
     pub fn mul_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v * scalar).collect();
@@ -240,8 +272,8 @@ impl Vector {
     ///
     /// ```rust
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
-    /// vector.div_scalar(2.);
-    /// assert_eq!(vector, Vector::new(vec![(2. / 2.), (3. / 2.), (5. / 2.)]));
+    /// vector.div_scalar(&2.);
+    /// assert_eq!(vector, Vector::new(vec![2. / 2., 3. / 2., 5. / 2.]));
     /// ```
     pub fn div_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v / scalar).collect();
@@ -253,8 +285,8 @@ impl Vector {
     ///
     /// ```rust
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
-    /// vector.add_scalar(2.);
-    /// assert_eq!(vector, Vector::new(vec![(2. + 2.), (3. + 2.), (5. + 2.)]));
+    /// vector.add_scalar(&2.);
+    /// assert_eq!(vector, Vector::new(vec![2. + 2., 3. + 2., 5. + 2.]));
     /// ```
     pub fn add_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v + scalar).collect();
@@ -266,8 +298,8 @@ impl Vector {
     ///
     /// ```rust
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
-    /// vector.sub_scalar(2.);
-    /// assert_eq!(vector, Vector::new(vec![(2. - 2.), (3. - 2.), (5. - 2.)]));
+    /// vector.sub_scalar(&2.);
+    /// assert_eq!(vector, Vector::new(vec![2. - 2., 3. - 2., 5. - 2.]));
     /// ```
     pub fn sub_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v - scalar).collect();
@@ -323,21 +355,42 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_angle() {
+    fn index() {
+        let vector = Vector::new(vec![1., 3., 6.]);
+        assert_eq!(vector.index(1), 3.);
+    }
+
+    #[test]
+    fn cross_vec() {
+        let vector1 = Vector::new(vec![1., 0., 0.]);
+        let vector2 = Vector::new(vec![0., 1., 0.]);
+        assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
+    }
+
+    #[test]
+    #[should_panic(expected = "this only works with 3 dimensional vectors")]
+    fn cross_vec_panic() {
+        let vector1 = Vector::new(vec![1., 0., 0., 2.]);
+        let vector2 = Vector::new(vec![0., 1., 0., 2.]);
+        let _ = vector1.cross_vec(&vector2);
+    }
+
+    #[test]
+    fn angle() {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
         assert_eq!(vector1.angle(&vector2), 90.);
     }
 
     #[test]
-    fn test_rot() {
+    fn rot() {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
         assert_eq!(vector1.rot(&vector2), 1.5707964);
     }
 
     #[test]
-    fn test_bytes() {
+    fn bytes() {
         let vector = Vector::new(vec![2., 1., 6.]);
         assert_eq!(
             vector.bytes(),
@@ -346,47 +399,47 @@ mod tests {
     }
 
     #[test]
-    fn test_vec() {
+    fn vec() {
         let vector = Vector::new(vec![2., 1., 6.]);
         assert_eq!(vector.vec(), vec![2., 1., 6.]);
     }
 
     #[test]
-    fn test_mul_scalar() {
+    fn mul_scalar() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
         vector.mul_scalar(&2.);
-        assert_eq!(vector, Vector::new(vec![(2. * 2.), (3. * 2.), (5. * 2.)]));
+        assert_eq!(vector, Vector::new(vec![2. * 2., 3. * 2., 5. * 2.]));
     }
 
     #[test]
-    fn test_div_scalar() {
+    fn div_scalar() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
         vector.div_scalar(&2.);
-        assert_eq!(vector, Vector::new(vec![(2. / 2.), (3. / 2.), (5. / 2.)]));
+        assert_eq!(vector, Vector::new(vec![2. / 2., 3. / 2., 5. / 2.]));
     }
 
     #[test]
-    fn test_add_scalar() {
+    fn add_scalar() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
         vector.add_scalar(&2.);
-        assert_eq!(vector, Vector::new(vec![(2. + 2.), (3. + 2.), (5. + 2.)]));
+        assert_eq!(vector, Vector::new(vec![2. + 2., 3. + 2., 5. + 2.]));
     }
 
     #[test]
-    fn test_sub_scalar() {
+    fn sub_scalar() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
         vector.sub_scalar(&2.);
-        assert_eq!(vector, Vector::new(vec![(2. - 2.), (3. - 2.), (5. - 2.)]));
+        assert_eq!(vector, Vector::new(vec![2. - 2., 3. - 2., 5. - 2.]));
     }
 
     #[test]
-    fn test_mag() {
+    fn mag() {
         let vector = Vector::new(vec![2., 3., 5.]);
         assert_eq!(vector.mag(), ((2 * 2 + 3 * 3 + 5 * 5) as f32).sqrt());
     }
 
     #[test]
-    fn test_unit() {
+    fn unit() {
         let mut vector = Vector::new(vec![3., 3., 5.]);
         let dot = vector.mag();
         let temp = vector.clone();
@@ -398,85 +451,95 @@ mod tests {
     }
 
     #[test]
-    fn test_len() {
+    fn len() {
         let vector = Vector::new(vec![4., 3., 5.]);
         assert_eq!(vector.len(), 3);
     }
 
     #[test]
-    fn test_dot_vec() {
+    fn dot_vec() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8.]);
         assert_eq!(vector1.dot_vec(&vector2), 38.);
     }
 
     #[test]
-    #[should_panic]
-    fn test_dot_vec_panic() {
+    #[should_panic(
+        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
+    )]
+    fn dot_vec_panic() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8., 1.]);
         vector1.dot_vec(&vector2);
     }
 
     #[test]
-    fn test_mul_vec() {
+    fn mul_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.mul_vec(&vector2);
-        assert_eq!(vector1, Vector::new(vec![(0. * 3.), (2. * 1.), (3. * 3.)]));
+        assert_eq!(vector1, Vector::new(vec![0. * 3., 2. * 1., 3. * 3.]));
     }
 
     #[test]
-    #[should_panic]
-    fn test_mul_vec_panic() {
+    #[should_panic(
+        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
+    )]
+    fn mul_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         vector1.mul_vec(&vector2);
     }
 
     #[test]
-    fn test_add_vec() {
+    fn add_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.add_vec(&vector2);
-        assert_eq!(vector1, Vector::new(vec![(0. + 3.), (2. + 1.), (3. + 3.)]));
+        assert_eq!(vector1, Vector::new(vec![0. + 3., 2. + 1., 3. + 3.]));
     }
 
     #[test]
-    #[should_panic]
-    fn test_add_vec_panic() {
+    #[should_panic(
+        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
+    )]
+    fn add_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         vector1.add_vec(&vector2);
     }
 
     #[test]
-    fn test_sub_vec() {
+    fn sub_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.sub_vec(&vector2);
-        assert_eq!(vector1, Vector::new(vec![(0. - 3.), (2. - 1.), (3. - 3.)]));
+        assert_eq!(vector1, Vector::new(vec![0. - 3., 2. - 1., 3. - 3.]));
     }
 
     #[test]
-    #[should_panic]
-    fn test_sub_vec_panic() {
+    #[should_panic(
+        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
+    )]
+    fn sub_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         vector1.sub_vec(&vector2);
     }
 
     #[test]
-    fn test_div_vec() {
+    fn div_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.div_vec(&vector2);
-        assert_eq!(vector1, Vector::new(vec![(0. / 3.), (2. / 1.), (3. / 3.)]));
+        assert_eq!(vector1, Vector::new(vec![0. / 3., 2. / 1., 3. / 3.]));
     }
 
     #[test]
-    #[should_panic]
-    fn test_div_vec_panic() {
+    #[should_panic(
+        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
+    )]
+    fn div_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         vector1.mul_vec(&vector2);

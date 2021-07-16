@@ -1,5 +1,6 @@
-#[path = "linear_algebra/vector.rs"]
 mod vector;
+mod matrix;
+
 
 fn main() {
     println!("Hello, world!");
@@ -10,7 +11,7 @@ mod tests {
     // use super::*;
 
     #[test]
-    fn test() {
+    fn it_works() {
         assert_eq!(4, 2 + 2);
     }
 }
