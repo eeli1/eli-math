@@ -1,4 +1,5 @@
 pub mod linear_algebra;
+pub mod misc;
 
 #[cfg(test)]
 mod tests {
