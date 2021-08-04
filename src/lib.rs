@@ -1,10 +1,5 @@
-mod vector;
-mod matrix;
-
-
-fn main() {
-    println!("Hello, world!");
-}
+pub mod linear_algebra;
+pub mod misc;
 
 #[cfg(test)]
 mod tests {
