@@ -1,5 +1,7 @@
 use std::mem;
 
+use crate::random;
+
 #[derive(PartialEq, Clone, Debug)]
 /// this is a reper for `Vec<f32>`
 ///
@@ -14,8 +16,22 @@ impl Vector {
         Self { vec }
     }
 
+    /// generates a vector of length `len` with random values between 0 and 1
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use eli_math::linear_algebra::Vector;
+    /// let vector = Vector::new_rand(4);
+    /// assert_eq!(vector.vec(), vec![0.69186187, 0.3494884, 0.23957491, 0.06540034]);
+    /// ```
     pub fn new_rand(len: usize) -> Self {
-        Self { vec: vec![] }
+        let mut rand = random::Random::new();
+        let mut vec = Vec::new();
+        for _ in 0..len {
+            vec.push(rand.f32());
+        }
+        Self { vec }
     }
 
     /// this returns the [`cross product`]
@@ -385,6 +401,41 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    /// generates a matrix of size `cols` and `rows` with random values between 0 and 1
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use eli_math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new_rand(2, 3);
+    /// assert_eq!(
+    ///     matrix.matrix_flatt(),
+    ///     vec![
+    ///        0.69186187,
+    ///        0.3494884,
+    ///        0.23957491,
+    ///        0.06540034,
+    ///        0.5443042,
+    ///        0.013656098,
+    ///    ]
+    /// );
+    /// ```
+    pub fn new_rand(cols: usize, rows: usize) -> Self {
+        let mut rand = random::Random::new();
+        let mut matrix_flatt = Vec::new();
+        for _ in 0..cols {
+            for _ in 0..rows {
+                matrix_flatt.push(rand.f32());
+            }
+        }
+        Self {
+            cols,
+            rows,
+            matrix_flatt,
+            is_transpose: false,
+        }
+    }
+
     /// this return a vector of bytes representing the matrix
     ///
     /// this is useful for the *GPU* because the interface only uses bytes

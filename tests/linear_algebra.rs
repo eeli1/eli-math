@@ -1,6 +1,15 @@
 #[cfg(test)]
-mod tests {
-    use eli_math::linear_algebra::*;
+mod tests_vec {
+    use eli_math::linear_algebra::Vector;
+
+    #[test]
+    fn new_rand() {
+        let vector = Vector::new_rand(4);
+        assert_eq!(
+            vector.vec(),
+            vec![0.69186187, 0.3494884, 0.23957491, 0.06540034]
+        );
+    }
 
     #[test]
     fn index_vec() {
@@ -74,7 +83,7 @@ mod tests {
     }
 
     #[test]
-    fn sub_scalar_vec() {
+    fn sub_scalar() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
         vector.sub_scalar(&2.);
         assert_eq!(vector, Vector::new(vec![2. - 2., 3. - 2., 5. - 2.]));
@@ -196,7 +205,46 @@ mod tests {
     // ----------------------------------------------------------------------------------------------------------------------------------------------------- //
     // ----------------------------------------------------------------------------------------------------------------------------------------------------- //
     // ----------------------------------------------------------------------------------------------------------------------------------------------------- //
+}
+#[cfg(test)]
+mod tests_mat {
+    use eli_math::linear_algebra::Matrix;
+    use eli_math::linear_algebra::Vector;
 
+    #[test]
+    fn new_rand() {
+        let matrix = Matrix::new_rand(3, 4);
+        assert_eq!(
+            matrix.matrix_flatt(),
+            vec![
+                0.69186187,
+                0.3494884,
+                0.23957491,
+                0.06540034,
+                0.5443042,
+                0.013656098,
+                0.4336478,
+                0.8349666,
+                0.10932327,
+                0.52898574,
+                0.4612443,
+                0.3579495,
+            ]
+        );
+
+        let matrix = Matrix::new_rand(2, 3);
+        assert_eq!(
+            matrix.matrix_flatt(),
+            vec![
+                0.69186187,
+                0.3494884,
+                0.23957491,
+                0.06540034,
+                0.5443042,
+                0.013656098,
+            ]
+        );
+    }
     #[test]
     #[ignore]
     fn det() {
