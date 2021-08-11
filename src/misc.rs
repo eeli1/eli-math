@@ -1,10 +1,9 @@
-
 use std::mem;
 
 /// implementation for the [`fast inverse square root`] 1/sqrt(x)
-/// 
-/// [`fast inverse square root`]:https://en.wikipedia.org/wiki/Fast_inverse_square_root 
-/// 
+///
+/// [`fast inverse square root`]:https://en.wikipedia.org/wiki/Fast_inverse_square_root
+///
 ///
 /// ## Example
 ///
@@ -17,8 +16,8 @@ use std::mem;
 /// }
 /// assert_delta!(q_rsqrt(64.), 0.125, 0.001);
 /// ```
-/// 
-/// note this isn't that useful because you need a lot of calculation to feal the difference 
+///
+/// note this isn't that useful because you need a lot of calculation to feal the difference
 pub fn q_rsqrt(number: f32) -> f32 {
     let mut i: i32;
     let x2: f32;
@@ -42,10 +41,4 @@ pub fn q_rsqrt(number: f32) -> f32 {
     // y = y * (THREEHALVES - (x2 * y * y));
 
     return y;
-}
-
-
-#[cfg(test)]
-mod tests {
-    // use super::*;
 }
