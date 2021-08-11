@@ -81,6 +81,7 @@ impl Xorshift {
     /// for more informaiton go to the [`wiki`]
     ///
     /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    ///
     /// ## Example
     ///
     /// ```rust
@@ -90,12 +91,12 @@ impl Xorshift {
     /// ```
     pub fn xorshift32(&mut self) -> u32 {
         /*  */
-        let mut state = self.xorshift32_state;
-        let mut x = state.a;
+
+        let mut x = self.xorshift32_state.a;
         x ^= x << 13;
         x ^= x >> 17;
         x ^= x << 5;
-        state.a = x;
+        self.xorshift32_state.a = x;
         x
     }
 
@@ -103,6 +104,7 @@ impl Xorshift {
     /// for more informaiton go to the [`wiki`]
     ///
     /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    ///
     /// ## Example
     ///
     /// ```rust
@@ -111,13 +113,11 @@ impl Xorshift {
     /// assert_eq!(xorshift.xorshift64(), 8748534153485358512);
     /// ```
     pub fn xorshift64(&mut self) -> u64 {
-        let mut state = self.xorshift64_state;
-
-        let mut x = state.a;
+        let mut x = self.xorshift64_state.a;
         x ^= x << 13;
         x ^= x >> 7;
         x ^= x << 17;
-        state.a = x;
+        self.xorshift64_state.a = x;
         x
     }
 
@@ -125,27 +125,32 @@ impl Xorshift {
     /// for more informaiton go to the [`wiki`]
     ///
     /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    ///
     /// ## Example
     ///
     /// ```rust
     /// use eli_math::random::Xorshift;
     /// let mut xorshift = Xorshift::new();
-    /// assert_eq!(xorshift.xorshift128(), 1254528582);
+    /// assert_eq!(xorshift.xorshift128(), 1138687896200805812714748853);
     /// ```
-    pub fn xorshift128(&mut self) -> u32 {
-        let mut state = self.xorshift128_state;
+    pub fn xorshift128(&mut self) -> u128 {
+        let mut t = self.xorshift128_state.d;
 
-        let mut t = state.d;
-
-        let s = state.a;
-        state.d = state.c;
-        state.c = state.b;
-        state.b = s;
+        let s = self.xorshift128_state.a;
+        self.xorshift128_state.d = self.xorshift128_state.c;
+        self.xorshift128_state.c = self.xorshift128_state.b;
+        self.xorshift128_state.b = s;
 
         t ^= t << 11;
         t ^= t >> 8;
-        state.a = t ^ s ^ (s >> 19);
-        state.a
+        self.xorshift128_state.a = t ^ s ^ (s >> 19);
+
+        let mut result: u128 = 0;
+        result |= (self.xorshift128_state.a as u128) << 127;
+        result |= (self.xorshift128_state.b as u128) << 63;
+        result |= (self.xorshift128_state.c as u128) << 31;
+        result |= self.xorshift128_state.d as u128;
+        result
     }
 
     fn splitmix64(&mut self, state: &mut Splitmix64State) -> u64 {
@@ -248,5 +253,48 @@ impl Xorshift {
         s[3] = self.rol64(s[3], 45);
 
         return result;
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------------------------------------------- //
+// ----------------------------------------------------------------------------------------------------------------------------------------------------- //
+
+pub struct Random {
+    xorshift: Xorshift,
+}
+
+impl Random {
+    /// initializes the random number generator (currently Xorshift)
+    pub fn new() -> Self {
+        Random {
+            xorshift: Xorshift::new(),
+        }
+    }
+
+    /// generates a f32 (using the xorshift32) the f32 is has a value between 0 and 1
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use eli_math::random::Random;
+    /// let mut rand = Random::new();
+    /// assert_eq!(rand.f32(), 0.69186187);
+    /// ```
+    pub fn f32(&mut self) -> f32 {
+        (self.xorshift.xorshift32() as f32) / (u32::MAX as f32)
+    }
+
+    /// generates a f64 (using the xorshift64) the f64 is has a value between 0 and 1
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use eli_math::random::Random;
+    /// let mut rand = Random::new();
+    /// assert_eq!(rand.f64(), 0.47425898676362294);
+    /// ```
+    pub fn f64(&mut self) -> f64 {
+        (self.xorshift.xorshift64() as f64) / (u64::MAX as f64)
     }
 }
