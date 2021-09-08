@@ -3,6 +3,12 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    fn new_zero() {
+        let vector = Vector::new_zero(4);
+        assert_eq!(vector.vec(), vec![0., 0., 0., 0.]);
+    }
+
+    #[test]
     fn ops_add() {
         let vector1 = Vector::new(vec![2., 6., 3.]);
         let vector2 = Vector::new(vec![6., 3., 4.]);
