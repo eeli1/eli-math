@@ -78,9 +78,9 @@ impl Xorshift {
     }
 
     /// generates a u32 random number using the Algorithm "xor" (from p. 4 of Marsaglia, "Xorshift RNGs")
-    /// for more informaiton go to the [`wiki`]
+    /// for more informaiton go to the [wiki]
     ///
-    /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    /// [wiki]: https://en.wikipedia.org/wiki/Xorshift
     ///
     /// ## Example
     ///
@@ -101,9 +101,9 @@ impl Xorshift {
     }
 
     /// generates a u64 random number using the Algorithm "xor" (from p. 4 of Marsaglia, "Xorshift RNGs")
-    /// for more informaiton go to the [`wiki`]
+    /// for more informaiton go to the [wiki]
     ///
-    /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    /// [wiki]: https://en.wikipedia.org/wiki/Xorshift
     ///
     /// ## Example
     ///
@@ -122,9 +122,9 @@ impl Xorshift {
     }
 
     /// generates a u32 random number using the Algorithm "xor" (from p. 5 of Marsaglia, "Xorshift RNGs")
-    /// for more informaiton go to the [`wiki`]
+    /// for more informaiton go to the [wiki]
     ///
-    /// [`wiki`]: https://en.wikipedia.org/wiki/Xorshift
+    /// [wiki]: https://en.wikipedia.org/wiki/Xorshift
     ///
     /// ## Example
     ///

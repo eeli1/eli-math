@@ -174,6 +174,67 @@ impl Vector {
         sqr_sum.sqrt()
     }
 
+    /// sets the magnetude of the vector to a spicific value
+    ///   
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let mut vector = Vector::new(vec![2., 3., 5.]);
+    /// vector.set_mag(4.);
+    /// assert_eq!(vector.mag(), 4.);
+    /// ```
+    pub fn set_mag(&mut self, mag: f32) {
+        self.mul_scalar(&(mag / self.mag()));
+    }
+
+    /// calculates the [Euclidean distance] between 2 vectors
+    ///
+    /// [Euclidean distance]:https://en.wikipedia.org/wiki/Euclidean_distance
+    ///   
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector1 = Vector::new(vec![2., 7., 1.]);
+    /// let vector2 = Vector::new(vec![8., 2., 8.]);
+    /// assert_eq!(vector1.dist(&vector2), 10.488089);
+    /// ```
+    pub fn dist(&self, other: &Vector) -> f32 {
+        if self.vec.len() == other.len() {
+            let mut res = 0.;
+            for i in 0..self.vec.len() {
+                res += (self.vec[i] - other.vec()[i]) * (self.vec[i] - other.vec()[i]);
+            }
+            res.sqrt()
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+
+    /// Limit the magnitude of this vector to the value used for the `max` parameter
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let mut vector = Vector::new(vec![2., 3., 5.]);
+    /// vector.limit(2.);
+    /// assert_eq!(vector.mag(), 2.);
+    ///
+    /// vector.limit(3.);
+    /// assert_eq!(vector.mag(), 2.);
+    /// ```
+    pub fn limit(&mut self, max: f32) {
+        if self.mag() > max {
+            self.set_mag(max);
+        }
+    }
+
     /// normalizes the vetor same dirction but the magnetude is 1
     ///
     /// ## Example
@@ -191,9 +252,9 @@ impl Vector {
 
 // vector math
 impl Vector {
-    /// this returns the [`cross product`]
+    /// this returns the [cross product]
     ///
-    /// [`cross product`]: https://en.wikipedia.org/wiki/Cross_product
+    /// [cross product]: https://en.wikipedia.org/wiki/Cross_product
     ///
     /// ## Example
     ///
@@ -216,9 +277,9 @@ impl Vector {
         ])
     }
 
-    /// returns the [`dot product`]
+    /// returns the [dot product]
     ///
-    /// [`dot product`]: https://en.wikipedia.org/wiki/Dot_product
+    /// [dot product]: https://en.wikipedia.org/wiki/Dot_product
     ///
     /// ## Example
     ///
@@ -432,9 +493,9 @@ impl Vector {
     }
 
     /// the returns the length of the vec
-    /// or in mathematical terms the [`dimensions`] of the vector
+    /// or in mathematical terms the [dimensions] of the vector
     ///
-    /// [`dimensions`]: https://en.wikipedia.org/wiki/Dimension_(vector_space)
+    /// [dimensions]: https://en.wikipedia.org/wiki/Dimension_(vector_space)
     ///
     /// ## Example
     ///
@@ -762,9 +823,9 @@ impl Matrix {
         self.is_transpose
     }
 
-    /// [`transposes`] matrix flips rows and cols
+    /// [transposes] matrix flips rows and cols
     ///
-    /// [`transposes`]: https://en.wikipedia.org/wiki/Transpose
+    /// [transposes]: https://en.wikipedia.org/wiki/Transpose
     pub fn transpose(&mut self) {
         self.is_transpose = !self.is_transpose;
     }
@@ -918,9 +979,9 @@ impl Matrix {
 }
 
 impl Matrix {
-    /// returns the [`determinant`] of this matrix
+    /// returns the [determinant] of this matrix
     ///
-    /// [`determinant`]: https://en.wikipedia.org/wiki/Determinant
+    /// [determinant]: https://en.wikipedia.org/wiki/Determinant
     ///
     /// ## Example
     ///
@@ -929,9 +990,9 @@ impl Matrix {
     /// let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
     /// assert_eq!(matrix.det(), 49.);
     /// #```
-    /// note the matrix has to be a [`square matrix`]
+    /// note the matrix has to be a [square matrix]
     ///
-    /// [`square matrix`]: https://en.wikipedia.org/wiki/Square_matrix
+    /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn det(&self) -> f32 {
         if self.cols() != self.rows() {
             panic!("the matrix has to be a square matrix");
@@ -939,18 +1000,18 @@ impl Matrix {
         todo!();
     }
 
-    /// this returns the [`eigenvalues`] of this matrix
+    /// this returns the [eigenvalues] of this matrix
     ///
-    /// [`eigenvalues`]: https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
+    /// [eigenvalues]: https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
     ///
     /// ## Example
     ///
     /// ```rust
     ///
     /// ```
-    /// note the matrix has to be a [`square matrix`]
+    /// note the matrix has to be a [square matrix]
     ///
-    /// [`square matrix`]: https://en.wikipedia.org/wiki/Square_matrix
+    /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn eigen_val(&self) -> f32 {
         if self.cols() != self.rows() {
             panic!("the matrix has to be a square matrix");
