@@ -30,14 +30,14 @@ impl Add for Vector {
     }
 }
 
-impl Mul for Vector {
+impl Sub for Vector {
     type Output = Self;
 
-    fn mul(self, other: Self) -> Self {
+    fn sub(self, other: Self) -> Self {
         if self.vec.len() == other.len() {
             let mut vec = Vec::with_capacity(self.vec.len());
             for i in 0..self.vec.len() {
-                vec.push(self.vec[i] * other.vec()[i]);
+                vec.push(self.vec[i] - other.vec()[i]);
             }
             Self::new(vec)
         } else {
@@ -50,14 +50,14 @@ impl Mul for Vector {
     }
 }
 
-impl Sub for Vector {
+impl Mul for Vector {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self {
+    fn mul(self, other: Self) -> Self {
         if self.vec.len() == other.len() {
             let mut vec = Vec::with_capacity(self.vec.len());
             for i in 0..self.vec.len() {
-                vec.push(self.vec[i] - other.vec()[i]);
+                vec.push(self.vec[i] * other.vec()[i]);
             }
             Self::new(vec)
         } else {
@@ -90,8 +90,7 @@ impl Div for Vector {
     }
 }
 
-impl Vector {}
-
+// new
 impl Vector {
     /// creates a new vector
     pub fn new(vec: Vec<f32>) -> Self {
@@ -116,44 +115,21 @@ impl Vector {
         Self { vec }
     }
 
-    /// this returns the [`cross product`]
-    ///
-    /// [`cross product`]: https://en.wikipedia.org/wiki/Cross_product
+    ///  generates a vector of length `len` with all values being 0.
     ///
     /// ## Example
     ///
     /// ```rust
     /// use math::linear_algebra::Vector;
-    /// let vector1 = Vector::new(vec![1., 0., 0.]);
-    /// let vector2 = Vector::new(vec![0., 1., 0.]);
-    /// assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
-    /// ```  
-    /// note this only works with 3 dimensional vectors
-    pub fn cross_vec(&self, other: &Vector) -> Vector {
-        if self.len() != 3 || other.len() != 3 {
-            panic!("this only works with 3 dimensional vectors");
-        }
-
-        Vector::new(vec![
-            self.index(1) * other.index(2) - self.index(2) * other.index(1),
-            self.index(2) * other.index(0) - self.index(0) * other.index(2),
-            self.index(0) * other.index(1) - self.index(1) * other.index(0),
-        ])
+    /// let vector = Vector::new_zero(4);
+    /// assert_eq!(vector.vec(), vec![0., 0., 0., 0.]);
+    /// ```
+    pub fn new_zero(len: usize) -> Self {
+        Self { vec: vec![0.; len] }
     }
+}
 
-    /// returns the value at the given index
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// use math::linear_algebra::Vector;
-    /// let vector = Vector::new(vec![1., 3., 6.]);
-    /// assert_eq!(vector.index(1), 3.);
-    /// ```  
-    pub fn index(&self, index: usize) -> f32 {
-        self.vec()[index]
-    }
-
+impl Vector {
     /// returns the angle in degrees between the 2 vectors
     ///   
     /// ## Example
@@ -181,7 +157,9 @@ impl Vector {
     pub fn rot(&self, other: &Vector) -> f32 {
         (self.dot_vec(other) / (self.mag() * other.mag())).acos()
     }
+}
 
+impl Vector {
     /// returns the magnetude of the vector
     ///
     /// ## Example
@@ -194,6 +172,67 @@ impl Vector {
     pub fn mag(&self) -> f32 {
         let sqr_sum: f32 = self.vec.iter().map(|v| v * v).sum();
         sqr_sum.sqrt()
+    }
+
+    /// sets the magnetude of the vector to a spicific value
+    ///   
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let mut vector = Vector::new(vec![2., 3., 5.]);
+    /// vector.set_mag(4.);
+    /// assert_eq!(vector.mag(), 4.);
+    /// ```
+    pub fn set_mag(&mut self, mag: f32) {
+        self.mul_scalar(&(mag / self.mag()));
+    }
+
+    /// calculates the [Euclidean distance] between 2 vectors
+    ///
+    /// [Euclidean distance]:https://en.wikipedia.org/wiki/Euclidean_distance
+    ///   
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector1 = Vector::new(vec![2., 7., 1.]);
+    /// let vector2 = Vector::new(vec![8., 2., 8.]);
+    /// assert_eq!(vector1.dist(&vector2), 10.488089);
+    /// ```
+    pub fn dist(&self, other: &Vector) -> f32 {
+        if self.vec.len() == other.len() {
+            let mut res = 0.;
+            for i in 0..self.vec.len() {
+                res += (self.vec[i] - other.vec()[i]) * (self.vec[i] - other.vec()[i]);
+            }
+            res.sqrt()
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+
+    /// Limit the magnitude of this vector to the value used for the `max` parameter
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let mut vector = Vector::new(vec![2., 3., 5.]);
+    /// vector.limit(2.);
+    /// assert_eq!(vector.mag(), 2.);
+    ///
+    /// vector.limit(3.);
+    /// assert_eq!(vector.mag(), 2.);
+    /// ```
+    pub fn limit(&mut self, max: f32) {
+        if self.mag() > max {
+            self.set_mag(max);
+        }
     }
 
     /// normalizes the vetor same dirction but the magnetude is 1
@@ -209,26 +248,38 @@ impl Vector {
     pub fn unit(&mut self) {
         self.div_scalar(&self.mag());
     }
+}
 
-    /// the returns the length of the vec
-    /// or in mathematical terms the [`dimensions`] of the vector
+// vector math
+impl Vector {
+    /// this returns the [cross product]
     ///
-    /// [`dimensions`]: https://en.wikipedia.org/wiki/Dimension_(vector_space)
+    /// [cross product]: https://en.wikipedia.org/wiki/Cross_product
     ///
     /// ## Example
     ///
     /// ```rust
     /// use math::linear_algebra::Vector;
-    /// let vector = Vector::new(vec![4., 3., 5.]);    
-    /// assert_eq!(vector.len(), 3);
-    /// ```
-    pub fn len(&self) -> usize {
-        self.vec.len()
+    /// let vector1 = Vector::new(vec![1., 0., 0.]);
+    /// let vector2 = Vector::new(vec![0., 1., 0.]);
+    /// assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
+    /// ```  
+    /// note this only works with 3 dimensional vectors
+    pub fn cross_vec(&self, other: &Vector) -> Vector {
+        if self.len() != 3 || other.len() != 3 {
+            panic!("this only works with 3 dimensional vectors");
+        }
+
+        Vector::new(vec![
+            self.index(1) * other.index(2) - self.index(2) * other.index(1),
+            self.index(2) * other.index(0) - self.index(0) * other.index(2),
+            self.index(0) * other.index(1) - self.index(1) * other.index(0),
+        ])
     }
 
-    /// returns the [`dot product`]
+    /// returns the [dot product]
     ///
-    /// [`dot product`]: https://en.wikipedia.org/wiki/Dot_product
+    /// [dot product]: https://en.wikipedia.org/wiki/Dot_product
     ///
     /// ## Example
     ///
@@ -366,7 +417,10 @@ impl Vector {
             );
         }
     }
+}
 
+// scalar math
+impl Vector {
     /// multiplies each component from the vector with a scalar value and stors the result in this vector   
     ///
     /// ## Example
@@ -422,7 +476,9 @@ impl Vector {
     pub fn sub_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v - scalar).collect();
     }
+}
 
+impl Vector {
     /// getter for the internal Vec<f32> representation
     ///
     /// ## Example
@@ -436,6 +492,37 @@ impl Vector {
         self.vec.clone()
     }
 
+    /// the returns the length of the vec
+    /// or in mathematical terms the [dimensions] of the vector
+    ///
+    /// [dimensions]: https://en.wikipedia.org/wiki/Dimension_(vector_space)
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![4., 3., 5.]);    
+    /// assert_eq!(vector.len(), 3);
+    /// ```
+    pub fn len(&self) -> usize {
+        self.vec.len()
+    }
+
+    /// returns the value at the given index
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![1., 3., 6.]);
+    /// assert_eq!(vector.index(1), 3.);
+    /// ```  
+    pub fn index(&self, index: usize) -> f32 {
+        self.vec()[index]
+    }
+}
+
+impl Vector {
     /// this return a vector of bytes representing the vector
     ///
     /// this is useful for the *GPU* because the interface only uses bytes
@@ -483,6 +570,39 @@ pub struct Matrix {
 }
 
 impl Matrix {
+    /// converts 2d vec in to matrix
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+    /// ```
+    /// crates matrix that looks like this:
+    ///
+    /// [3.0, 2.0, 4.0]
+    /// [4.0, 5.0, 6.0]
+    ///
+    pub fn new(vec: Vec<Vec<f32>>) -> Self {
+        let cols = vec.len();
+        let rows = vec[0].len();
+
+        let mut flatt: Vec<f32> = Vec::with_capacity(cols * rows);
+
+        vec.iter().for_each(|col| {
+            if col.len() != rows {
+                panic!("wrong row shape expected {}, got {}", rows, col.len())
+            }
+            col.iter().for_each(|&x| flatt.push(x))
+        });
+
+        Self {
+            cols: cols,
+            rows: rows,
+            matrix_flatt: flatt,
+            is_transpose: false,
+        }
+    }
     /// generates a matrix of size `cols` and `rows` with random values between 0 and 1
     ///
     /// ## Example
@@ -504,7 +624,7 @@ impl Matrix {
     /// ```
     pub fn new_rand(cols: usize, rows: usize) -> Self {
         let mut rand = random::Random::new();
-        let mut matrix_flatt = Vec::new();
+        let mut matrix_flatt = Vec::with_capacity(cols * rows);
         for _ in 0..cols {
             for _ in 0..rows {
                 matrix_flatt.push(rand.f32());
@@ -518,6 +638,32 @@ impl Matrix {
         }
     }
 
+    /// generates a matrix of size `cols` and `rows` with all values being 0.
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new_zero(2, 3);
+    /// assert_eq!(matrix.matrix_flatt(), vec![0., 0., 0., 0., 0., 0.]);
+    /// ```
+    pub fn new_zero(cols: usize, rows: usize) -> Self {
+        let mut matrix_flatt = Vec::with_capacity(cols * rows);
+        for _ in 0..cols {
+            for _ in 0..rows {
+                matrix_flatt.push(0.);
+            }
+        }
+        Self {
+            cols,
+            rows,
+            matrix_flatt,
+            is_transpose: false,
+        }
+    }
+}
+
+impl Matrix {
     /// this return a vector of bytes representing the matrix
     ///
     /// this is useful for the *GPU* because the interface only uses bytes
@@ -551,7 +697,8 @@ impl Matrix {
             .for_each(|&val| push_f32_bytes(val, &mut bytes));
         bytes
     }
-
+}
+impl Matrix {
     /// getter for the internal matrix_flatt representation
     ///
     /// ## Example
@@ -573,6 +720,32 @@ impl Matrix {
         } else {
             self.matrix_flatt.clone()
         }
+    }
+
+    /// return index(row, col) from matrix
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+    /// assert_eq!(matrix.index(0, 1), 2.);
+    /// ```
+    pub fn index(&self, mut row: usize, mut col: usize) -> f32 {
+        if self.is_transpose {
+            let temp = row;
+            row = col;
+            col = temp;
+        }
+
+        if self.rows < row + 1 {
+            panic!("index out of bounds max row {}", self.rows - 1)
+        }
+        if self.cols < col + 1 {
+            panic!("index out of bounds max col {}", self.cols - 1)
+        }
+
+        self.matrix_flatt[row * self.rows + col]
     }
 
     /// return the length of the columns
@@ -607,78 +780,6 @@ impl Matrix {
         } else {
             self.rows
         }
-    }
-
-    /// getter for the transpose
-    pub fn is_transpose(&self) -> bool {
-        self.is_transpose
-    }
-
-    /// converts 2d vec in to matrix
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-    /// ```
-    /// crates matrix that looks like this:
-    ///
-    /// [3.0, 2.0, 4.0]
-    /// [4.0, 5.0, 6.0]
-    ///
-    pub fn new(vec: Vec<Vec<f32>>) -> Self {
-        let cols = vec.len();
-        let rows = vec[0].len();
-
-        let mut flatt: Vec<f32> = Vec::with_capacity(cols * rows);
-
-        vec.iter().for_each(|col| {
-            if col.len() != rows {
-                panic!("wrong row shape expected {}, got {}", rows, col.len())
-            }
-            col.iter().for_each(|&x| flatt.push(x))
-        });
-
-        Self {
-            cols: cols,
-            rows: rows,
-            matrix_flatt: flatt,
-            is_transpose: false,
-        }
-    }
-
-    /// [`transposes`] matrix flips rows and cols
-    ///
-    /// [`transposes`]: https://en.wikipedia.org/wiki/Transpose
-    pub fn transpose(&mut self) {
-        self.is_transpose = !self.is_transpose;
-    }
-
-    fn get_col(&self, col: usize) -> Vector {
-        if self.cols < col + 1 {
-            panic!("index out of bounds max col {}", self.cols - 1)
-        }
-
-        let mut result: Vec<f32> = Vec::with_capacity(self.rows);
-        for i in (col * self.rows)..((1 + col) * self.rows) {
-            result.push(self.matrix_flatt[i].clone());
-        }
-
-        Vector::new(result)
-    }
-
-    fn get_row(&self, row: usize) -> Vector {
-        if self.rows < row + 1 {
-            panic!("index out of bounds max row {}", self.rows - 1)
-        }
-
-        let mut result: Vec<f32> = Vec::with_capacity(self.cols);
-        for i in 0..self.cols {
-            result.push(self.matrix_flatt[i * self.rows + row].clone());
-        }
-
-        Vector::new(result)
     }
 
     /// return column from matrix
@@ -717,32 +818,20 @@ impl Matrix {
         }
     }
 
-    /// return index(row, col) from matrix
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-    /// assert_eq!(matrix.index(0, 1), 2.);
-    /// ```
-    pub fn index(&self, mut row: usize, mut col: usize) -> f32 {
-        if self.is_transpose {
-            let temp = row;
-            row = col;
-            col = temp;
-        }
-
-        if self.rows < row + 1 {
-            panic!("index out of bounds max row {}", self.rows - 1)
-        }
-        if self.cols < col + 1 {
-            panic!("index out of bounds max col {}", self.cols - 1)
-        }
-
-        self.matrix_flatt[row * self.rows + col]
+    /// getter for the transpose
+    pub fn is_transpose(&self) -> bool {
+        self.is_transpose
     }
 
+    /// [transposes] matrix flips rows and cols
+    ///
+    /// [transposes]: https://en.wikipedia.org/wiki/Transpose
+    pub fn transpose(&mut self) {
+        self.is_transpose = !self.is_transpose;
+    }
+}
+
+impl Matrix {
     /// multiplies each component from the matrix with a scalar value and stors the result in this matrix   
     ///
     /// ## Example
@@ -822,7 +911,9 @@ impl Matrix {
     pub fn sub_scalar(&mut self, scalar: &f32) {
         self.matrix_flatt = self.matrix_flatt.iter().map(|x| x - scalar).collect();
     }
+}
 
+impl Matrix {
     /// dot product vector with matrix
     pub fn dot_vec(&self, vector: &Vector) -> Vector {
         let vec = vector.vec();
@@ -863,7 +954,9 @@ impl Matrix {
     pub fn div_vec(&mut self, vector: &Vector) {
         todo!();
     }
+}
 
+impl Matrix {
     pub fn add_mat(&mut self, other: &Matrix) {
         todo!();
     }
@@ -883,10 +976,12 @@ impl Matrix {
     pub fn dot_mat(&self) {
         todo!();
     }
+}
 
-    /// returns the [`determinant`] of this matrix
+impl Matrix {
+    /// returns the [determinant] of this matrix
     ///
-    /// [`determinant`]: https://en.wikipedia.org/wiki/Determinant
+    /// [determinant]: https://en.wikipedia.org/wiki/Determinant
     ///
     /// ## Example
     ///
@@ -895,9 +990,9 @@ impl Matrix {
     /// let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
     /// assert_eq!(matrix.det(), 49.);
     /// #```
-    /// note the matrix has to be a [`square matrix`]
+    /// note the matrix has to be a [square matrix]
     ///
-    /// [`square matrix`]: https://en.wikipedia.org/wiki/Square_matrix
+    /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn det(&self) -> f32 {
         if self.cols() != self.rows() {
             panic!("the matrix has to be a square matrix");
@@ -905,18 +1000,18 @@ impl Matrix {
         todo!();
     }
 
-    /// this returns the [`eigenvalues`] of this matrix
+    /// this returns the [eigenvalues] of this matrix
     ///
-    /// [`eigenvalues`]: https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
+    /// [eigenvalues]: https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
     ///
     /// ## Example
     ///
     /// ```rust
     ///
     /// ```
-    /// note the matrix has to be a [`square matrix`]
+    /// note the matrix has to be a [square matrix]
     ///
-    /// [`square matrix`]: https://en.wikipedia.org/wiki/Square_matrix
+    /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn eigen_val(&self) -> f32 {
         if self.cols() != self.rows() {
             panic!("the matrix has to be a square matrix");
@@ -929,5 +1024,33 @@ impl Matrix {
             panic!("the matrix has to be a square matrix");
         }
         todo!();
+    }
+}
+
+impl Matrix {
+    fn get_row(&self, row: usize) -> Vector {
+        if self.rows < row + 1 {
+            panic!("index out of bounds max row {}", self.rows - 1)
+        }
+
+        let mut result: Vec<f32> = Vec::with_capacity(self.cols);
+        for i in 0..self.cols {
+            result.push(self.matrix_flatt[i * self.rows + row].clone());
+        }
+
+        Vector::new(result)
+    }
+
+    fn get_col(&self, col: usize) -> Vector {
+        if self.cols < col + 1 {
+            panic!("index out of bounds max col {}", self.cols - 1)
+        }
+
+        let mut result: Vec<f32> = Vec::with_capacity(self.rows);
+        for i in (col * self.rows)..((1 + col) * self.rows) {
+            result.push(self.matrix_flatt[i].clone());
+        }
+
+        Vector::new(result)
     }
 }

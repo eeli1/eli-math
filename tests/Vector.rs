@@ -3,6 +3,37 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    fn dist() {
+        let vector1 = Vector::new(vec![2., 7., 1.]);
+        let vector2 = Vector::new(vec![8., 2., 8.]);
+        assert_eq!(vector1.dist(&vector2), 10.488089);
+    }
+
+    #[test]
+    fn limit() {
+        let mut vector = Vector::new(vec![2., 3., 5.]);
+        vector.limit(2.);
+        assert_eq!(vector.mag(), 2.);
+
+        vector.limit(3.);
+        assert_eq!(vector.mag(), 2.);
+    }
+
+    #[test]
+    fn set_mag() {
+        let mut vector = Vector::new(vec![2., 3., 5.]);
+        vector.set_mag(4.);
+        assert_eq!(vector.mag(), 4.);
+        assert_eq!(vector.vec(), vec![1.2977713, 1.946657, 3.2444284]);
+    }
+
+    #[test]
+    fn new_zero() {
+        let vector = Vector::new_zero(4);
+        assert_eq!(vector.vec(), vec![0., 0., 0., 0.]);
+    }
+
+    #[test]
     fn ops_add() {
         let vector1 = Vector::new(vec![2., 6., 3.]);
         let vector2 = Vector::new(vec![6., 3., 4.]);

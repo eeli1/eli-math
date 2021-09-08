@@ -4,6 +4,12 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    fn new_zero() {
+        let matrix = Matrix::new_zero(2, 3);
+        assert_eq!(matrix.matrix_flatt(), vec![0., 0., 0., 0., 0., 0.]);
+    }
+
+    #[test]
     fn new_rand() {
         let matrix = Matrix::new_rand(3, 4);
         assert_eq!(

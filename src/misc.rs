@@ -1,8 +1,8 @@
 use std::mem;
 
-/// implementation for the [`fast inverse square root`] 1/sqrt(x)
+/// implementation for the [fast inverse square root] 1/sqrt(x)
 ///
-/// [`fast inverse square root`]:https://en.wikipedia.org/wiki/Fast_inverse_square_root
+/// [fast inverse square root]:https://en.wikipedia.org/wiki/Fast_inverse_square_root
 ///
 ///
 /// ## Example
