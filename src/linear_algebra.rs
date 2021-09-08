@@ -1,6 +1,6 @@
-use std::mem;
-
 use crate::random;
+use std::mem;
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(PartialEq, Clone, Debug)]
 /// this is a reper for `Vec<f32>`
@@ -9,6 +9,88 @@ use crate::random;
 pub struct Vector {
     vec: Vec<f32>,
 }
+
+impl Add for Vector {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        if self.vec.len() == other.len() {
+            let mut vec = Vec::with_capacity(self.vec.len());
+            for i in 0..self.vec.len() {
+                vec.push(self.vec[i] + other.vec()[i]);
+            }
+            Self::new(vec)
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+}
+
+impl Mul for Vector {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        if self.vec.len() == other.len() {
+            let mut vec = Vec::with_capacity(self.vec.len());
+            for i in 0..self.vec.len() {
+                vec.push(self.vec[i] * other.vec()[i]);
+            }
+            Self::new(vec)
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+}
+
+impl Sub for Vector {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        if self.vec.len() == other.len() {
+            let mut vec = Vec::with_capacity(self.vec.len());
+            for i in 0..self.vec.len() {
+                vec.push(self.vec[i] - other.vec()[i]);
+            }
+            Self::new(vec)
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+}
+
+impl Div for Vector {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
+        if self.vec.len() == other.len() {
+            let mut vec = Vec::with_capacity(self.vec.len());
+            for i in 0..self.vec.len() {
+                vec.push(self.vec[i] / other.vec()[i]);
+            }
+            Self::new(vec)
+        } else {
+            panic!(
+                "the other vector has not the same len self.len() = {}, other.len() = {}",
+                self.len(),
+                other.len()
+            );
+        }
+    }
+}
+
+impl Vector {}
 
 impl Vector {
     /// creates a new vector
