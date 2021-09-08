@@ -85,7 +85,7 @@ impl Xorshift {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::random::Xorshift;
+    /// use math::random::Xorshift;
     /// let mut xorshift = Xorshift::new();
     /// assert_eq!(xorshift.xorshift32(), 2971524119);
     /// ```
@@ -108,7 +108,7 @@ impl Xorshift {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::random::Xorshift;
+    /// use math::random::Xorshift;
     /// let mut xorshift = Xorshift::new();
     /// assert_eq!(xorshift.xorshift64(), 8748534153485358512);
     /// ```
@@ -129,7 +129,7 @@ impl Xorshift {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::random::Xorshift;
+    /// use math::random::Xorshift;
     /// let mut xorshift = Xorshift::new();
     /// assert_eq!(xorshift.xorshift128(), 1138687896200805812714748853);
     /// ```
@@ -277,7 +277,7 @@ impl Random {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::random::Random;
+    /// use math::random::Random;
     /// let mut rand = Random::new();
     /// assert_eq!(rand.f32(), 0.69186187);
     /// ```
@@ -290,7 +290,7 @@ impl Random {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::random::Random;
+    /// use math::random::Random;
     /// let mut rand = Random::new();
     /// assert_eq!(rand.f64(), 0.47425898676362294);
     /// ```

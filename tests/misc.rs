@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use eli_math::misc::*;
+    use math::misc::*;
 
     macro_rules! assert_delta {
         ($x:expr, $y:expr, $d:expr) => {

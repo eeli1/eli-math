@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use eli_math::random::*;
+    use math::random::*;
 
     #[test]
     fn xorshift32() {

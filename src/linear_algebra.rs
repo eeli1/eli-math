@@ -21,7 +21,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new_rand(4);
     /// assert_eq!(vector.vec(), vec![0.69186187, 0.3494884, 0.23957491, 0.06540034]);
     /// ```
@@ -41,7 +41,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector1 = Vector::new(vec![1., 0., 0.]);
     /// let vector2 = Vector::new(vec![0., 1., 0.]);
     /// assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
@@ -64,7 +64,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new(vec![1., 3., 6.]);
     /// assert_eq!(vector.index(1), 3.);
     /// ```  
@@ -77,7 +77,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector1 = Vector::new(vec![1., 0., 0.]);
     /// let vector2 = Vector::new(vec![0., 1., 0.]);
     /// assert_eq!(vector1.angle(&vector2), 90.);
@@ -91,7 +91,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector1 = Vector::new(vec![1., 0., 0.]);
     /// let vector2 = Vector::new(vec![0., 1., 0.]);
     /// assert_eq!(vector1.rot(&vector2), 1.5707964);
@@ -105,7 +105,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new(vec![2., 3., 5.]);
     /// assert_eq!(vector.mag(), ((2. * 2. + 3. * 3. + 5. * 5.) as f32).sqrt());
     /// ```
@@ -119,7 +119,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
     /// vector.unit();
     /// assert_eq!(vector.mag(), 1.);
@@ -136,7 +136,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new(vec![4., 3., 5.]);    
     /// assert_eq!(vector.len(), 3);
     /// ```
@@ -151,7 +151,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector1 = Vector::new(vec![2., 7., 1.]);    
     /// let vector2 = Vector::new(vec![8., 2., 8.]);
     /// assert_eq!(vector1.dot_vec(&vector2), 38.);
@@ -178,7 +178,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
     /// vector1.mul_vec(&vector2);
@@ -206,7 +206,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
     /// vector1.add_vec(&vector2);
@@ -234,7 +234,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
     /// vector1.sub_vec(&vector2);
@@ -262,7 +262,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector1 = Vector::new(vec![0., 2., 3.]);
     /// let vector2 = Vector::new(vec![3., 1., 3.]);
     /// vector1.div_vec(&vector2);
@@ -290,7 +290,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
     /// vector.mul_scalar(&2.);
     /// assert_eq!(vector, Vector::new(vec![2. * 2., 3. * 2., 5. * 2.]));
@@ -304,7 +304,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
     /// vector.div_scalar(&2.);
     /// assert_eq!(vector, Vector::new(vec![2. / 2., 3. / 2., 5. / 2.]));
@@ -318,7 +318,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
     /// vector.add_scalar(&2.);
     /// assert_eq!(vector, Vector::new(vec![2. + 2., 3. + 2., 5. + 2.]));
@@ -332,7 +332,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
     /// vector.sub_scalar(&2.);
     /// assert_eq!(vector, Vector::new(vec![2. - 2., 3. - 2., 5. - 2.]));
@@ -346,7 +346,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 1., 6.]);
     /// assert_eq!(vector.vec(), vec![2., 1., 6.]);
     /// ```
@@ -361,7 +361,7 @@ impl Vector {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new(vec![2., 1., 6.]);
     /// assert_eq!(
     ///    vector.bytes(),
@@ -406,7 +406,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new_rand(2, 3);
     /// assert_eq!(
     ///     matrix.matrix_flatt(),
@@ -443,7 +443,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
     /// assert_eq!(
     ///     matrix.bytes(),
@@ -475,7 +475,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
     /// ```
@@ -498,7 +498,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// assert_eq!(matrix.cols(), 2);
     /// ```
@@ -515,7 +515,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// assert_eq!(matrix.rows(), 3);
     /// ```
@@ -537,7 +537,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// ```
     /// crates matrix that looks like this:
@@ -604,8 +604,8 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// assert_eq!(matrix.col(0), Vector::new(vec![3., 2., 4.]));
     /// ```
@@ -622,8 +622,8 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
-    /// use eli_math::linear_algebra::Vector;
+    /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// assert_eq!(matrix.row(0), Vector::new(vec![3., 4.]));
     /// ```
@@ -640,7 +640,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
     /// assert_eq!(matrix.index(0, 1), 2.);
     /// ```
@@ -666,7 +666,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// matrix.mul_scalar(&2.);
     /// assert_eq!(
@@ -686,7 +686,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// matrix.add_scalar(&2.);
     /// assert_eq!(
@@ -706,7 +706,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// matrix.div_scalar(&2.);
     /// assert_eq!(
@@ -726,7 +726,7 @@ impl Matrix {
     /// ## Example
     ///
     /// ```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// matrix.sub_scalar(&2.);
     /// assert_eq!(
@@ -809,7 +809,7 @@ impl Matrix {
     /// ## Example
     ///
     /// #```rust
-    /// use eli_math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
     /// assert_eq!(matrix.det(), 49.);
     /// #```
