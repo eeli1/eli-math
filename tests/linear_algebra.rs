@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests_vec {
-    use eli_math::linear_algebra::Vector;
+    use math::linear_algebra::Vector;
 
     #[test]
     fn new_rand() {
@@ -208,8 +208,8 @@ mod tests_vec {
 }
 #[cfg(test)]
 mod tests_mat {
-    use eli_math::linear_algebra::Matrix;
-    use eli_math::linear_algebra::Vector;
+    use math::linear_algebra::Matrix;
+    use math::linear_algebra::Vector;
 
     #[test]
     fn new_rand() {

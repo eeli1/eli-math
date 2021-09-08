@@ -8,7 +8,7 @@ use std::mem;
 /// ## Example
 ///
 /// ```rust
-/// use eli_math::misc::q_rsqrt;
+/// use math::misc::q_rsqrt;
 /// macro_rules! assert_delta {
 ///   ($x:expr, $y:expr, $d:expr) => {
 ///     if !($x - $y < $d || $y - $x < $d) { panic!(); }
