@@ -1,6 +1,7 @@
 use crate::linear_algebra::Vector;
 use crate::random;
 use std::mem;
+use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct Matrix {

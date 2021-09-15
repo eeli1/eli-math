@@ -23,21 +23,15 @@ pub struct Vector {
 impl Add for Vector {
     type Output = Self;
     fn add(self, other: Self) -> Self {
-        check_same_len(&self, &other);
-        let mut vec = Vec::with_capacity(self.vec.len());
-        for i in 0..self.vec.len() {
-            vec.push(self.vec[i] + other.vec[i]);
-        }
-        Self::new(vec)
+        let mut result = self.clone();
+        result.add_vec(&other);
+        result
     }
 }
 
 impl AddAssign for Vector {
     fn add_assign(&mut self, other: Self) {
-        check_same_len(&self, &other);
-        for i in 0..other.len() {
-            self.vec[i] = self.vec[i] + other.vec[i];
-        }
+        self.add_vec(&other);
     }
 }
 
@@ -45,21 +39,15 @@ impl Sub for Vector {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
-        check_same_len(&self, &other);
-        let mut vec = Vec::with_capacity(self.vec.len());
-        for i in 0..self.vec.len() {
-            vec.push(self.vec[i] - other.vec[i]);
-        }
-        Self::new(vec)
+        let mut result = self.clone();
+        result.sub_vec(&other);
+        result
     }
 }
 
 impl SubAssign for Vector {
     fn sub_assign(&mut self, other: Self) {
-        check_same_len(&self, &other);
-        for i in 0..other.len() {
-            self.vec[i] = self.vec[i] - other.vec[i];
-        }
+        self.sub_vec(&other);
     }
 }
 
@@ -67,21 +55,15 @@ impl Mul for Vector {
     type Output = Self;
 
     fn mul(self, other: Self) -> Self {
-        check_same_len(&self, &other);
-        let mut vec = Vec::with_capacity(self.vec.len());
-        for i in 0..self.vec.len() {
-            vec.push(self.vec[i] * other.vec()[i]);
-        }
-        Self::new(vec)
+        let mut result = self.clone();
+        result.mul_vec(&other);
+        result
     }
 }
 
 impl MulAssign for Vector {
     fn mul_assign(&mut self, other: Self) {
-        check_same_len(&self, &other);
-        for i in 0..other.len() {
-            self.vec[i] = self.vec[i] * other.vec[i];
-        }
+        self.mul_vec(&other);
     }
 }
 
@@ -89,21 +71,15 @@ impl Div for Vector {
     type Output = Self;
 
     fn div(self, other: Self) -> Self {
-        check_same_len(&self, &other);
-        let mut vec = Vec::with_capacity(self.vec.len());
-        for i in 0..self.vec.len() {
-            vec.push(self.vec[i] / other.vec()[i]);
-        }
-        Self::new(vec)
+        let mut result = self.clone();
+        result.div_vec(&other);
+        result
     }
 }
 
 impl DivAssign for Vector {
     fn div_assign(&mut self, other: Self) {
-        check_same_len(&self, &other);
-        for i in 0..other.len() {
-            self.vec[i] = self.vec[i] / other.vec[i];
-        }
+        self.div_vec(&other);
     }
 }
 
@@ -213,19 +189,12 @@ impl Vector {
     /// assert_eq!(vector1.dist(&vector2), 10.488089);
     /// ```
     pub fn dist(&self, other: &Vector) -> f32 {
-        if self.vec.len() == other.len() {
-            let mut res = 0.;
-            for i in 0..self.vec.len() {
-                res += (self.vec[i] - other.vec()[i]) * (self.vec[i] - other.vec()[i]);
-            }
-            res.sqrt()
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        let mut res = 0.;
+        for i in 0..self.vec.len() {
+            res += (self.vec[i] - other.vec()[i]) * (self.vec[i] - other.vec()[i]);
         }
+        res.sqrt()
     }
 
     /// Limit the magnitude of this vector to the value used for the `max` parameter
@@ -302,19 +271,12 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len  
     pub fn dot_vec(&self, other: &Vector) -> f32 {
-        if self.vec.len() == other.len() {
-            let mut res = 0.;
-            for i in 0..self.vec.len() {
-                res += self.vec[i] * other.vec()[i];
-            }
-            res
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        let mut res = 0.;
+        for i in 0..self.vec.len() {
+            res += self.vec[i] * other.vec()[i];
         }
+        res
     }
 
     /// multiplies each component from the vector with the component of the other vector and stors the result in this vector   
@@ -330,18 +292,9 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn mul_vec(&mut self, other: &Vector) {
-        if self.vec.len() == other.len() {
-            let mut vec = Vec::with_capacity(self.vec.len());
-            for i in 0..self.vec.len() {
-                vec.push(self.vec[i] * other.vec()[i]);
-            }
-            self.vec = vec;
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] * other.vec[i];
         }
     }
 
@@ -358,18 +311,9 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn add_vec(&mut self, other: &Vector) {
-        if self.vec.len() == other.len() {
-            let mut vec = Vec::with_capacity(self.vec.len());
-            for i in 0..self.vec.len() {
-                vec.push(self.vec[i] + other.vec()[i]);
-            }
-            self.vec = vec;
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] + other.vec[i];
         }
     }
 
@@ -386,18 +330,9 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn sub_vec(&mut self, other: &Vector) {
-        if self.vec.len() == other.len() {
-            let mut vec = Vec::with_capacity(self.vec.len());
-            for i in 0..self.vec.len() {
-                vec.push(self.vec[i] - other.vec()[i]);
-            }
-            self.vec = vec;
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] - other.vec[i];
         }
     }
 
@@ -414,24 +349,12 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len
     pub fn div_vec(&mut self, other: &Vector) {
-        if self.vec.len() == other.len() {
-            let mut vec = Vec::with_capacity(self.vec.len());
-            for i in 0..self.vec.len() {
-                vec.push(self.vec[i] / other.vec()[i]);
-            }
-            self.vec = vec;
-        } else {
-            panic!(
-                "the other vector has not the same len self.len() = {}, other.len() = {}",
-                self.len(),
-                other.len()
-            );
+        check_same_len(self, other);
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] / other.vec[i];
         }
     }
-}
 
-// scalar math
-impl Vector {
     /// multiplies each component from the vector with a scalar value and stors the result in this vector   
     ///
     /// ## Example
@@ -487,9 +410,7 @@ impl Vector {
     pub fn sub_scalar(&mut self, scalar: &f32) {
         self.vec = self.vec.iter().map(|v| v - scalar).collect();
     }
-}
 
-impl Vector {
     /// getter for the internal Vec<f32> representation
     ///
     /// ## Example
@@ -531,9 +452,7 @@ impl Vector {
     pub fn index(&self, index: usize) -> f32 {
         self.vec()[index]
     }
-}
 
-impl Vector {
     /// this return a vector of bytes representing the vector
     ///
     /// this is useful for the *GPU* because the interface only uses bytes
