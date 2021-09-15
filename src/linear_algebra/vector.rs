@@ -450,7 +450,7 @@ impl Vector {
     /// assert_eq!(vector.index(1), 3.);
     /// ```  
     pub fn index(&self, index: usize) -> f32 {
-        self.vec()[index]
+        self.vec[index]
     }
 
     /// this return a vector of bytes representing the vector

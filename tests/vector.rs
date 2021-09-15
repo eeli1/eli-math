@@ -43,28 +43,12 @@ mod tests {
     }
 
     #[test]
-    fn add_assign() {
-        let mut vector1 = Vector::new(vec![2., 6., 3.]);
-        let vector2 = Vector::new(vec![6., 3., 4.]);
-        vector1 += vector2;
-        assert_eq!(vector1, Vector::new(vec![8.0, 9.0, 7.0]));
-    }
-
-    #[test]
     fn ops_sub() {
         let vector1 = Vector::new(vec![2., 6., 3.]);
         let vector2 = Vector::new(vec![6., 3., 4.]);
         let result = Vector::new(vec![-4.0, 3.0, -1.0]);
 
         assert_eq!(vector1 - vector2, result);
-    }
-
-    #[test]
-    fn sub_assign() {
-        let mut vector1 = Vector::new(vec![2., 6., 3.]);
-        let vector2 = Vector::new(vec![6., 3., 4.]);
-        vector1 -= vector2;
-        assert_eq!(vector1, Vector::new(vec![-4.0, 3.0, -1.0]));
     }
 
     #[test]
@@ -77,20 +61,36 @@ mod tests {
     }
 
     #[test]
-    fn mul_assign() {
-        let mut vector1 = Vector::new(vec![2., 6., 3.]);
-        let vector2 = Vector::new(vec![6., 3., 4.]);
-        vector1 *= vector2;
-        assert_eq!(vector1, Vector::new(vec![12.0, 18.0, 12.0]));
-    }
-
-    #[test]
     fn ops_div() {
         let vector1 = Vector::new(vec![2., 6., 3.]);
         let vector2 = Vector::new(vec![6., 3., 4.]);
         let result = Vector::new(vec![0.33333334, 2.0, 0.75]);
 
         assert_eq!(vector1 / vector2, result);
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut vector1 = Vector::new(vec![2., 6., 3.]);
+        let vector2 = Vector::new(vec![6., 3., 4.]);
+        vector1 += vector2;
+        assert_eq!(vector1, Vector::new(vec![8.0, 9.0, 7.0]));
+    }
+
+    #[test]
+    fn sub_assign() {
+        let mut vector1 = Vector::new(vec![2., 6., 3.]);
+        let vector2 = Vector::new(vec![6., 3., 4.]);
+        vector1 -= vector2;
+        assert_eq!(vector1, Vector::new(vec![-4.0, 3.0, -1.0]));
+    }
+
+    #[test]
+    fn mul_assign() {
+        let mut vector1 = Vector::new(vec![2., 6., 3.]);
+        let vector2 = Vector::new(vec![6., 3., 4.]);
+        vector1 *= vector2;
+        assert_eq!(vector1, Vector::new(vec![12.0, 18.0, 12.0]));
     }
 
     #[test]
