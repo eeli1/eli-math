@@ -481,24 +481,108 @@ impl Matrix {
         todo!();
     }
 
+    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    ///
+    /// matrix1.add_mat(&matrix2);
+    /// assert_eq!(
+    ///     matrix1,
+    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+    /// );
+    /// ```
+    /// note it panics if the matrixs have not the same rows and cols
     pub fn add_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        todo!();
+        for row in 0..self.rows() - 1 {
+            for col in 0..self.cols() - 1 {
+                let val = self.index(row, col) + other.index(row, col);
+                self.set_index(row, col, val);
+            }
+        }
     }
 
+    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    ///
+    /// matrix1.sub_mat(&matrix2);
+    /// assert_eq!(
+    ///   matrix1,
+    ///   Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+    /// );
+    /// ```
+    /// note it panics if the matrixs have not the same rows and cols
     pub fn sub_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        todo!();
+        for row in 0..self.rows() - 1 {
+            for col in 0..self.cols() - 1 {
+                let val = self.index(row, col) - other.index(row, col);
+                self.set_index(row, col, val);
+            }
+        }
     }
 
+    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    ///
+    /// matrix1.div_mat(&matrix2);
+    /// assert_eq!(
+    ///     matrix1,
+    ///     Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+    /// );
+    /// ```
+    /// note it panics if the matrixs have not the same rows and cols
     pub fn div_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        todo!();
+        for row in 0..self.rows() - 1 {
+            for col in 0..self.cols() - 1 {
+                let val = self.index(row, col) / other.index(row, col);
+                self.set_index(row, col, val);
+            }
+        }
     }
 
+    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    ///
+    /// matrix1.mul_mat(&matrix2);
+    /// assert_eq!(
+    ///   matrix1,
+    ///   Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+    /// );
+    /// ```
+    /// note it panics if the matrixs have not the same rows and cols
     pub fn mul_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        todo!();
+        for row in 0..self.rows() - 1 {
+            for col in 0..self.cols() - 1 {
+                let val = self.index(row, col) * other.index(row, col);
+                self.set_index(row, col, val);
+            }
+        }
     }
 
     pub fn dot_mat(&self, other: &Matrix) {

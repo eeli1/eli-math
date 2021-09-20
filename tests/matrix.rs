@@ -11,6 +11,204 @@ mod tests {
     }
 
     #[test]
+    fn add_mat() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1.add_mat(&matrix2);
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1.add_mat(&matrix2);
+        assert_eq!(matrix1.matrix_flatt(), vec![6.0, 5.0, -3.0, 0.0, 1.0, -1.0]);
+    }
+
+    #[test]
+    fn sub_mat() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1.sub_mat(&matrix2);
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1.sub_mat(&matrix2);
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![-2.0, -1.0, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn mul_mat() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1.mul_mat(&matrix2);
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1.mul_mat(&matrix2);
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![8.0, -56.0, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn div_mat() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1.div_mat(&matrix2);
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1.div_mat(&matrix2);
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![0.5, -0.071428575, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn add_assign() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1 += matrix2;
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1 += matrix2;
+        assert_eq!(matrix1.matrix_flatt(), vec![6.0, 5.0, -3.0, 0.0, 1.0, -1.0]);
+    }
+
+    #[test]
+    fn sub_assign() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1 -= matrix2;
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1 -= matrix2;
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![-2.0, -1.0, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn mul_assign() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1 *= matrix2;
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1 *= matrix2;
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![8.0, -56.0, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn div_assign() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        matrix1 /= matrix2;
+        assert_eq!(
+            matrix1,
+            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+        );
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+        matrix1 /= matrix2;
+        assert_eq!(
+            matrix1.matrix_flatt(),
+            vec![0.5, -0.071428575, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn add() {
+        let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        assert_eq!(
+            matrix1 + matrix2,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+        );
+    }
+
+    #[test]
+    fn sub() {
+        let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        assert_eq!(
+            matrix1 - matrix2,
+            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+        );
+    }
+
+    #[test]
+    fn mul() {
+        let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        assert_eq!(
+            matrix1 * matrix2,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+        );
+    }
+
+    #[test]
+    fn div() {
+        let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+
+        assert_eq!(
+            matrix1 / matrix2,
+            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+        );
+    }
+
+    #[test]
     fn set_index() {
         let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
         assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
