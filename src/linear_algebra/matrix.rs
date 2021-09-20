@@ -11,6 +11,69 @@ pub struct Matrix {
     is_transpose: bool,
 }
 
+impl Add for Matrix {
+    type Output = Self;
+    fn add(self, other: Self) -> Self {
+        let mut result = self.clone();
+        result.add_mat(&other);
+        result
+    }
+}
+
+impl AddAssign for Matrix {
+    fn add_assign(&mut self, other: Self) {
+        self.add_mat(&other);
+    }
+}
+
+impl Sub for Matrix {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        let mut result = self.clone();
+        result.sub_mat(&other);
+        result
+    }
+}
+
+impl SubAssign for Matrix {
+    fn sub_assign(&mut self, other: Self) {
+        self.sub_mat(&other);
+    }
+}
+
+impl Mul for Matrix {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        let mut result = self.clone();
+        result.mul_mat(&other);
+        result
+    }
+}
+
+impl MulAssign for Matrix {
+    fn mul_assign(&mut self, other: Self) {
+        self.mul_mat(&other);
+    }
+}
+
+impl Div for Matrix {
+    type Output = Self;
+
+    fn div(self, other: Self) -> Self {
+        let mut result = self.clone();
+        result.div_mat(&other);
+        result
+    }
+}
+
+impl DivAssign for Matrix {
+    fn div_assign(&mut self, other: Self) {
+        self.div_mat(&other);
+    }
+}
+
 impl Matrix {
     /// converts 2d vec in to matrix
     ///
@@ -151,7 +214,7 @@ impl Matrix {
         if self.is_transpose {
             let mut matrix_flatt = Vec::with_capacity(self.cols * self.rows);
             for i in 0..self.rows {
-                for val in self.row(i).vec() {
+                for val in self.col(i).vec() {
                     matrix_flatt.push(val);
                 }
             }
@@ -177,6 +240,32 @@ impl Matrix {
             col = temp;
         }
 
+        if self.rows < row {
+            panic!("index out of bounds max row {}", self.rows - 1)
+        }
+        if self.cols < col {
+            panic!("index out of bounds max col {}", self.cols - 1)
+        }
+
+        self.matrix_flatt[row * self.rows + col]
+    }
+
+    /// sets the value of the matrix at the specifide index row col
+    ///
+    /// ## Example
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// matrix.set_index(0, 1, 10.);
+    /// assert_eq!(matrix.matrix_flatt(), vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]);
+    /// ```
+    pub fn set_index(&mut self, mut row: usize, mut col: usize, val: f32) {
+        if self.is_transpose {
+            let temp = row;
+            row = col;
+            col = temp;
+        }
+
         if self.rows < row + 1 {
             panic!("index out of bounds max row {}", self.rows - 1)
         }
@@ -184,7 +273,7 @@ impl Matrix {
             panic!("index out of bounds max col {}", self.cols - 1)
         }
 
-        self.matrix_flatt[row * self.rows + col]
+        self.matrix_flatt[row * self.rows + col] = val;
     }
 
     /// return the length of the columns
@@ -255,6 +344,10 @@ impl Matrix {
         } else {
             self.get_row(row)
         }
+    }
+
+    pub fn is_square(&self) -> bool {
+        self.cols() == self.rows()
     }
 
     /// getter for the transpose
@@ -352,13 +445,7 @@ impl Matrix {
     /// dot product vector with matrix
     pub fn dot_vec(&self, vector: &Vector) -> Vector {
         let vec = vector.vec();
-        if vec.len() != self.rows {
-            panic!(
-                "wrong vector shape expected {}, got {}",
-                self.rows,
-                vec.len()
-            )
-        }
+        check_vector(self, vector);
 
         let mut result: Vec<f32> = Vec::with_capacity(self.cols);
         for i in 0..self.cols {
@@ -375,38 +462,47 @@ impl Matrix {
     }
 
     pub fn add_vec(&mut self, vector: &Vector) {
+        check_vector(self, vector);
         todo!();
     }
 
     pub fn sub_vec(&mut self, vector: &Vector) {
+        check_vector(self, vector);
         todo!();
     }
 
     pub fn mul_vec(&mut self, vector: &Vector) {
+        check_vector(self, vector);
         todo!();
     }
 
     pub fn div_vec(&mut self, vector: &Vector) {
+        check_vector(self, vector);
         todo!();
     }
 
     pub fn add_mat(&mut self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
     pub fn sub_mat(&mut self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
     pub fn div_mat(&mut self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
     pub fn mul_mat(&mut self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
-    pub fn dot_mat(&self) {
+    pub fn dot_mat(&self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
@@ -425,9 +521,7 @@ impl Matrix {
     ///
     /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn det(&self) -> f32 {
-        if self.cols() != self.rows() {
-            panic!("the matrix has to be a square matrix");
-        }
+        check_square(self);
         todo!();
     }
 
@@ -444,16 +538,12 @@ impl Matrix {
     ///
     /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn eigen_val(&self) -> f32 {
-        if self.cols() != self.rows() {
-            panic!("the matrix has to be a square matrix");
-        }
+        check_square(self);
         todo!();
     }
 
     pub fn eigen_vec(&self) -> Vector {
-        if self.cols() != self.rows() {
-            panic!("the matrix has to be a square matrix");
-        }
+        check_square(self);
         todo!();
     }
 
@@ -481,5 +571,31 @@ impl Matrix {
         }
 
         Vector::new(result)
+    }
+}
+
+fn check_square(mat: &Matrix) {
+    if !mat.is_square() {
+        panic!("the matrix has to be a square matrix");
+    }
+}
+
+fn check_vector(mat: &Matrix, vec: &Vector) {
+    if vec.len() != mat.rows() {
+        panic!(
+            "wrong vector shape expected {}, got {}",
+            mat.rows,
+            vec.len()
+        )
+    }
+}
+
+fn check_matrix(mat1: &Matrix, mat2: &Matrix) {
+    if mat1.rows() != mat2.rows() {
+        panic!("wrong row shape expected {}, got {}", mat1.rows, mat2.rows)
+    }
+
+    if mat1.cols() != mat2.cols() {
+        panic!("wrong col shape expected {}, got {}", mat1.cols, mat2.cols)
     }
 }

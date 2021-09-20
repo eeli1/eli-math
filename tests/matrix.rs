@@ -4,6 +4,52 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    #[ignore]
+    fn det() {
+        let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
+        assert_eq!(matrix.det(), 49.);
+    }
+
+    #[test]
+    fn set_index() {
+        let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+        assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
+        matrix.set_index(0, 1, 10.);
+        assert_eq!(matrix.matrix_flatt(), vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]);
+        matrix.transpose();
+        assert_eq!(matrix.matrix_flatt(), vec![2.0, 7.0, 10.0, 1.0, 5.0, 4.0]);
+        matrix.set_index(0, 1, 10.);
+        assert_eq!(matrix.matrix_flatt(), vec![2.0, 10.0, 10.0, 1.0, 5.0, 4.0]);
+    }
+
+    #[test]
+    fn matrix_flatt() {
+        let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+        assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
+        matrix.transpose();
+        assert_eq!(matrix.matrix_flatt(), vec![2., 7., 3., 1., 5., 4.]);
+    }
+
+    #[test]
+    fn index() {
+        let mut matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+        assert_eq!(matrix.index(0, 0), 3.);
+        assert_eq!(matrix.index(0, 1), 2.);
+        assert_eq!(matrix.index(0, 2), 4.);
+        assert_eq!(matrix.index(1, 0), 4.);
+        assert_eq!(matrix.index(1, 1), 5.);
+        assert_eq!(matrix.index(1, 2), 6.);
+
+        matrix.transpose();
+        assert_eq!(matrix.index(0, 0), 3.);
+        assert_eq!(matrix.index(0, 1), 4.);
+        assert_eq!(matrix.index(1, 0), 2.);
+        assert_eq!(matrix.index(1, 1), 5.);
+        assert_eq!(matrix.index(2, 0), 4.);
+        assert_eq!(matrix.index(2, 1), 6.);
+    }
+
+    #[test]
     fn new_zero() {
         let matrix = Matrix::new_zero(2, 3);
         assert_eq!(matrix.matrix_flatt(), vec![0., 0., 0., 0., 0., 0.]);
@@ -44,13 +90,6 @@ mod tests {
         );
     }
     #[test]
-    #[ignore]
-    fn det() {
-        let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
-        assert_eq!(matrix.det(), 49.);
-    }
-
-    #[test]
     #[should_panic(expected = "the matrix has to be a square matrix")]
     fn det_panic() {
         let matrix = Matrix::new(vec![
@@ -69,15 +108,6 @@ mod tests {
             matrix.bytes(),
             vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64]
         );
-    }
-
-    #[test]
-    #[ignore]
-    fn matrix_flatt() {
-        let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
-        assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
-        matrix.transpose();
-        assert_eq!(matrix.matrix_flatt(), vec![2., 7., 3., 1., 5., 4.]);
     }
 
     #[test]
@@ -189,18 +219,6 @@ mod tests {
     fn col_panic() {
         let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
         let _ = matrix.col(2);
-    }
-
-    #[test]
-    #[ignore]
-    fn index_mat() {
-        let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-        assert_eq!(matrix.index(0, 0), 3.);
-        assert_eq!(matrix.index(0, 1), 2.);
-        assert_eq!(matrix.index(0, 2), 4.);
-        assert_eq!(matrix.index(1, 0), 4.);
-        assert_eq!(matrix.index(1, 1), 5.);
-        assert_eq!(matrix.index(1, 2), 6.);
     }
 
     #[test]
