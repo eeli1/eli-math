@@ -6,19 +6,19 @@ mod tests {
     #[test]
     fn det() {
         let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
-        assert_eq!(matrix.det(), -5.);
+        assert_eq!(matrix.det(), -2.);
 
         let matrix = Matrix::new(vec![vec![3., 8.], vec![4., 6.]]);
-        assert_eq!(matrix.det(), 2.);
+        assert_eq!(matrix.det(), -14.);
 
         let matrix = Matrix::new(vec![vec![4., 6.], vec![3., 8.]]);
-        assert_eq!(matrix.det(), 23.);
+        assert_eq!(matrix.det(), 14.);
 
         let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
-        assert_eq!(matrix.det(), -122.);
+        assert_eq!(matrix.det(), -46.);
 
         let matrix = Matrix::new(vec![vec![6., 1., 1.], vec![4., -2., 5.], vec![2., 8., 7.]]);
-        assert_eq!(matrix.det(), -410.);
+        assert_eq!(matrix.det(), -316.);
 
         let matrix = Matrix::new(vec![
             vec![6., 1., 1., 4.],
@@ -26,7 +26,7 @@ mod tests {
             vec![2., 8., 7., 3.],
             vec![4., 1., 4., 2.],
         ]);
-        assert_eq!(matrix.det(), 2148.);
+        assert_eq!(matrix.det(), -3748.);
     }
 
     #[test]

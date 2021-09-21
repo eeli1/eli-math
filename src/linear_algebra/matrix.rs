@@ -721,11 +721,6 @@ impl Matrix {
         }
     }
 
-    pub fn dot_mat(&self, other: &Matrix) {
-        check_matrix(self, other);
-        todo!();
-    }
-
     /// returns the [determinant] of this matrix
     ///
     /// [determinant]: https://en.wikipedia.org/wiki/Determinant
@@ -735,7 +730,7 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
-    /// assert_eq!(matrix.det(), -5.);
+    /// assert_eq!(matrix.det(), -2.);
     /// ```
     ///  note the matrix has to be a [square matrix]
     ///
@@ -743,7 +738,7 @@ impl Matrix {
     pub fn det(&self) -> f32 {
         check_square(self);
         if self.rows() == 2 {
-            self.index(0, 0) * self.index(1, 1) - self.index(1, 0) * self.index(1, 0)
+            self.index(0, 0) * self.index(1, 1) - self.index(1, 0) * self.index(0, 1)
         } else {
             let mut sign = 1.;
             let mut sum = 0.;
@@ -791,6 +786,11 @@ impl Matrix {
 
     pub fn eigen_vec(&self) -> Vector {
         check_square(self);
+        todo!();
+    }
+
+    pub fn dot_mat(&self, other: &Matrix) {
+        check_matrix(self, other);
         todo!();
     }
 
