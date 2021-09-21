@@ -108,6 +108,33 @@ impl Matrix {
             is_transpose: false,
         }
     }
+
+    /// generats a matrix from a 1D Vector
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3);
+    /// assert_eq!(matrix.matrix_flatt(), vec![3., 2., 4., 4., 5., 6.]);
+    /// ```
+    pub fn new_flatt(matrix_flatt: Vec<f32>, cols: usize, rows: usize) -> Self {
+        if cols * rows != matrix_flatt.len() {
+            panic!(
+                "cols * rows = {} has to be the same len as the matrix_flatt = {}",
+                cols * rows,
+                matrix_flatt.len()
+            );
+        }
+
+        Self {
+            cols,
+            rows,
+            matrix_flatt,
+            is_transpose: false,
+        }
+    }
+
     /// generates a matrix of size `cols` and `rows` with random values between 0 and 1
     ///
     /// ## Example
@@ -346,6 +373,19 @@ impl Matrix {
         }
     }
 
+    /// returns true if the matrix is a [square matrix]  
+    ///
+    /// that means if it has as much rows as cols
+    ///
+    /// [square matrix]:https://en.wikipedia.org/wiki/Square_matrix
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]);
+    /// assert_eq!(matrix.is_square(), true);
+    /// ```
     pub fn is_square(&self) -> bool {
         self.cols() == self.rows()
     }
@@ -692,17 +732,44 @@ impl Matrix {
     ///
     /// ## Example
     ///
-    /// #```rust
+    /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
-    /// assert_eq!(matrix.det(), 49.);
-    /// #```
-    /// note the matrix has to be a [square matrix]
+    /// let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
+    /// assert_eq!(matrix.det(), -5.);
+    /// ```
+    ///  note the matrix has to be a [square matrix]
     ///
     /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
     pub fn det(&self) -> f32 {
         check_square(self);
-        todo!();
+        if self.rows() == 2 {
+            self.index(0, 0) * self.index(1, 1) - self.index(1, 0) * self.index(1, 0)
+        } else {
+            let mut sign = 1.;
+            let mut sum = 0.;
+
+            for col in 0..self.cols() {
+                let sub = self.finde_sub(0, col);
+                sum += sub.det() * sign * self.index(0, col);
+                sign *= -1.;
+            }
+
+            sum
+        }
+    }
+
+    // finds the sub matrix is user for the determinant
+    fn finde_sub(&self, row: usize, col: usize) -> Self {
+        let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));
+
+        for i in 0..self.cols() {
+            for j in 0..self.rows() {
+                if !(i == col || j == row) {
+                    flatt.push(self.index(i, j));
+                }
+            }
+        }
+        Self::new_flatt(flatt, self.cols() - 1, self.rows() - 1)
     }
 
     /// this returns the [eigenvalues] of this matrix
@@ -757,6 +824,10 @@ impl Matrix {
 fn check_square(mat: &Matrix) {
     if !mat.is_square() {
         panic!("the matrix has to be a square matrix");
+    }
+
+    if mat.rows() == 1 {
+        panic!("the matrix has to have more then one row");
     }
 }
 

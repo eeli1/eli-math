@@ -4,10 +4,35 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
-    #[ignore]
     fn det() {
+        let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
+        assert_eq!(matrix.det(), -5.);
+
+        let matrix = Matrix::new(vec![vec![3., 8.], vec![4., 6.]]);
+        assert_eq!(matrix.det(), 2.);
+
+        let matrix = Matrix::new(vec![vec![4., 6.], vec![3., 8.]]);
+        assert_eq!(matrix.det(), 23.);
+
         let matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.], vec![1., 4., 5.]]);
-        assert_eq!(matrix.det(), 49.);
+        assert_eq!(matrix.det(), -122.);
+
+        let matrix = Matrix::new(vec![vec![6., 1., 1.], vec![4., -2., 5.], vec![2., 8., 7.]]);
+        assert_eq!(matrix.det(), -410.);
+
+        let matrix = Matrix::new(vec![
+            vec![6., 1., 1., 4.],
+            vec![4., -2., 5., -7.],
+            vec![2., 8., 7., 3.],
+            vec![4., 1., 4., 2.],
+        ]);
+        assert_eq!(matrix.det(), 2148.);
+    }
+
+    #[test]
+    fn name() {
+        let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3);
+        assert_eq!(matrix.matrix_flatt(), vec![3., 2., 4., 4., 5., 6.]);
     }
 
     #[test]
@@ -382,6 +407,14 @@ mod tests {
     #[should_panic(expected = "wrong row shape expected 3, got 4")]
     fn new() {
         let _ = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4., 1.]]);
+    }
+
+    #[test]
+    fn is_square() {
+        let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+        assert_eq!(matrix.is_square(), false);
+        let matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]);
+        assert_eq!(matrix.is_square(), true);
     }
 
     #[test]
