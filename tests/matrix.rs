@@ -11,6 +11,76 @@ mod tests {
     }
 
     #[test]
+    fn add_vec() {
+        let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let vector = Vector::new(vec![2., 4., 6.]);
+        matrix.add_vec(&vector);
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![6.0, 0.0, -1.0]])
+        );
+
+        matrix.transpose();
+        let vector = Vector::new(vec![-2., 6.]);
+        matrix.add_vec(&vector);
+        assert_eq!(matrix.matrix_flatt(), vec![2.0, 4.0, -3.0, 0.0, 1.0, -1.0]);
+    }
+
+    #[test]
+    fn sub_vec() {
+        let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let vector = Vector::new(vec![2., 4., 6.]);
+        matrix.sub_vec(&vector);
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-2.0, 0.0, -1.0]])
+        );
+
+        matrix.transpose();
+        let vector = Vector::new(vec![-2., 6.]);
+        matrix.sub_vec(&vector);
+        assert_eq!(matrix.matrix_flatt(), vec![2.0, 0.0, -3.0, 0.0, 1.0, -1.0]);
+    }
+
+    #[test]
+    fn mul_vec() {
+        let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let vector = Vector::new(vec![2., 4., 6.]);
+        matrix.mul_vec(&vector);
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![8.0, 0.0, -1.0]])
+        );
+
+        matrix.transpose();
+        let vector = Vector::new(vec![-2., 6.]);
+        matrix.mul_vec(&vector);
+        assert_eq!(
+            matrix.matrix_flatt(),
+            vec![-8.0, -16.0, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
+    fn div_vec() {
+        let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        let vector = Vector::new(vec![2., 4., 6.]);
+        matrix.div_vec(&vector);
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.5, 0.0, -1.0]])
+        );
+
+        matrix.transpose();
+        let vector = Vector::new(vec![-2., 6.]);
+        matrix.div_vec(&vector);
+        assert_eq!(
+            matrix.matrix_flatt(),
+            vec![-0.5, -0.25, -3.0, 0.0, 1.0, -1.0]
+        );
+    }
+
+    #[test]
     fn add_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
