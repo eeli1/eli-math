@@ -442,13 +442,25 @@ impl Matrix {
         self.matrix_flatt = self.matrix_flatt.iter().map(|x| x - scalar).collect();
     }
 
-    /// dot product vector with matrix
+    /// computes the dot product between the vector and this matrix
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
+    /// let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
+    /// assert_eq!(
+    ///     matrix.dot_vec(&Vector::new(vec![2., 1., 0.])),
+    ///     Vector::new(vec![1., -3.])
+    /// );
+    /// ```
     pub fn dot_vec(&self, vector: &Vector) -> Vector {
         let vec = vector.vec();
         check_vector(self, vector);
 
-        let mut result: Vec<f32> = Vec::with_capacity(self.cols);
-        for i in 0..self.cols {
+        let mut result: Vec<f32> = Vec::with_capacity(self.cols());
+        for i in 0..self.cols() {
             result.push(
                 self.col(i)
                     .vec()

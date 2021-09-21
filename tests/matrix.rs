@@ -490,21 +490,27 @@ mod tests {
     }
 
     #[test]
-    fn dot_mat() {
-        let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
+    fn dot_vec() {
+        let mut matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
         assert_eq!(
             matrix.dot_vec(&Vector::new(vec![2., 1., 0.])),
             Vector::new(vec![1., -3.])
-        )
+        );
+
+        matrix.transpose();
+        assert_eq!(
+            matrix.dot_vec(&Vector::new(vec![2., 1.])),
+            Vector::new(vec![2.0, -5.0, 5.0])
+        );
     }
 
     #[test]
     #[should_panic(expected = "wrong vector shape expected 3, got 2")]
-    fn dot_vec_mat_panic() {
+    fn dot_vec_panic() {
         let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
         assert_eq!(
             matrix.dot_vec(&Vector::new(vec![2., 1.])),
             Vector::new(vec![1., -3.])
-        )
+        );
     }
 }
