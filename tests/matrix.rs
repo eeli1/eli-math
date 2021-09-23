@@ -574,14 +574,14 @@ mod tests {
     #[test]
     fn apply_func_val() {
         let mut matrix = Matrix::new(vec![vec![0.7, 0.2, 0.3], vec![0.5, 0.6, 0.1]]);
-        let step = Box::new(|x: f32| -> f32 {
+        let step: Box<(dyn Fn(f32) -> f32 + 'static)> = Box::new(|x: f32| -> f32 {
             if x > 0.5 {
                 1.
             } else {
                 0.
             }
         });
-        matrix.apply_func_val(step);
+        matrix.apply_func_val(&step);
         assert_eq!(matrix.matrix_flatt().vec(), vec![1., 0., 0., 0., 1., 0.]);
     }
 }

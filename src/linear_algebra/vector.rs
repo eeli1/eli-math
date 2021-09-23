@@ -127,17 +127,17 @@ impl Vector {
     /// ```rust
     /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![0.7, 0.2, 0.3]);
-    /// let step = Box::new(|x: f32| -> f32 {
-    ///     if x > 0.5 {
-    ///         1.
-    ///     } else {
-    ///         0.
-    ///     }
-    /// });
-    /// vector.apply_func(step);
-    /// assert_eq!(vector.vec(), vec![1., 0., 0.]);
+   /// let step: Box<(dyn Fn(f32) -> f32 + 'static)> = Box::new(|x: f32| -> f32 {
+   ///     if x > 0.5 {
+   ///         1.
+   ///     } else {
+   ///         0.
+   ///     }
+   /// });
+   /// vector.apply_func(&step);
+   /// assert_eq!(vector.vec(), vec![1., 0., 0.]);
     /// ```
-    pub fn apply_func(&mut self, lamda: Box<dyn Fn(f32) -> f32>) {
+    pub fn apply_func(&mut self, lamda: &Box<(dyn Fn(f32) -> f32 + 'static)>) {
         for i in 0..self.len() {
             self.vec[i] = lamda(self.vec[i]);
         }
