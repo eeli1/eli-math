@@ -5,6 +5,8 @@ mod tests {
 
     #[test]
     fn det() {
+        // examples from https://www.mathsisfun.com/algebra/matrix-determinant.html
+
         let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
         assert_eq!(matrix.det(), -2.);
 

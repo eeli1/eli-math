@@ -753,20 +753,6 @@ impl Matrix {
         }
     }
 
-    // finds the sub matrix is user for the determinant
-    fn finde_sub(&self, row: usize, col: usize) -> Self {
-        let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));
-
-        for i in 0..self.cols() {
-            for j in 0..self.rows() {
-                if !(i == col || j == row) {
-                    flatt.push(self.index(i, j));
-                }
-            }
-        }
-        Self::new_flatt(flatt, self.cols() - 1, self.rows() - 1)
-    }
-
     /// this returns the [eigenvalues] of this matrix
     ///
     /// [eigenvalues]: https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors
@@ -792,6 +778,29 @@ impl Matrix {
     pub fn dot_mat(&self, other: &Matrix) {
         check_matrix(self, other);
         todo!();
+    }
+
+    pub fn inv(&mut self) {
+        check_square(self);
+        let det = self.det();
+        if det == 0. {
+            panic!("the determinant of the matrix can't be 0")
+        }
+        todo!();
+    }
+
+    // finds the sub matrix is user for the determinant
+    fn finde_sub(&self, row: usize, col: usize) -> Self {
+        let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));
+
+        for i in 0..self.cols() {
+            for j in 0..self.rows() {
+                if !(i == col || j == row) {
+                    flatt.push(self.index(i, j));
+                }
+            }
+        }
+        Self::new_flatt(flatt, self.cols() - 1, self.rows() - 1)
     }
 
     fn get_row(&self, row: usize) -> Vector {
