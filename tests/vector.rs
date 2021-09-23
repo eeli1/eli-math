@@ -152,6 +152,7 @@ mod tests {
         assert_eq!(vector1.rot(&vector2), 1.5707964);
     }
 
+    #[cfg(feature = "gpu")]
     #[test]
     fn bytes_vec() {
         let vector = Vector::new(vec![2., 1., 6.]);

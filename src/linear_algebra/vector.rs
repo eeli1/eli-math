@@ -479,7 +479,10 @@ impl Vector {
         }
         self.vec[index] = val;
     }
+}
 
+#[cfg(feature = "gpu")]
+impl Vector {
     /// this return a vector of bytes representing the vector
     ///
     /// this is useful for the *GPU* because the interface only uses bytes

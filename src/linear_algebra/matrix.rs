@@ -184,41 +184,6 @@ impl Matrix {
         }
     }
 
-    /// this return a vector of bytes representing the matrix
-    ///
-    /// this is useful for the *GPU* because the interface only uses bytes
-    ///
-    /// ## Example
-    ///
-    /// ```rust
-    /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
-    /// assert_eq!(
-    ///     matrix.bytes(),
-    ///     vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64]
-    /// );
-    /// ```
-    /// note the fist and seconde `f32` is the rows and cols of the matrix
-    pub fn bytes(&self) -> Vec<u8> {
-        let size = (2 + self.matrix_flatt.len()) * mem::size_of::<f32>();
-        let mut bytes = Vec::<u8>::with_capacity(size);
-
-        let push_f32_bytes = |num: f32, bytes: &mut Vec<u8>| {
-            for b in num.to_ne_bytes().to_vec() {
-                bytes.push(b);
-            }
-        };
-
-        push_f32_bytes(self.rows() as f32, &mut bytes);
-        push_f32_bytes(self.cols() as f32, &mut bytes);
-
-        self.matrix_flatt()
-            .vec()
-            .iter()
-            .for_each(|&val| push_f32_bytes(val, &mut bytes));
-        bytes
-    }
-
     /// getter for the internal matrix_flatt representation
     ///
     /// ## Example
@@ -856,4 +821,37 @@ fn check_matrix(mat1: &Matrix, mat2: &Matrix) {
 }
 
 #[cfg(feature = "gpu")]
-impl Matrix {}
+impl Matrix {
+    /// this return a vector of bytes representing the matrix
+    ///
+    /// this is useful for the *GPU* because the interface only uses bytes
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
+    /// assert_eq!(
+    ///     matrix.bytes(),
+    ///     vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64]
+    /// );
+    /// ```
+    /// note the fist and seconde `f32` is the rows and cols of the matrix
+    pub fn bytes(&self) -> Vec<u8> {
+        let size = (2 + self.rows() * self.cols()) * mem::size_of::<f32>();
+        let mut bytes = Vec::<u8>::with_capacity(size);
+
+        for b in (self.rows() as f32).to_ne_bytes().to_vec() {
+            bytes.push(b);
+        }
+        for b in (self.cols() as f32).to_ne_bytes().to_vec() {
+            bytes.push(b);
+        }
+
+        // `skip(4)` because the first 4 bytes is the len of the vector (f32 = 4bytes)
+        for &b in self.matrix_flatt().bytes().iter().skip(4) {
+            bytes.push(b);
+        }
+        bytes
+    }
+}

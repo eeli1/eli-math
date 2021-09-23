@@ -3,10 +3,12 @@ name = "math"
 version = "0.1.0"
 authors = ["eeli1 <maierelias13@gmail.com>"]
 edition = "2018"
+resolver = "2"
 
 
 [features]
-gpu = []
+default = ["gpu"]
+gpu = ["wgpu"]
 
 [dependencies]
 wgpu = { version = "0.10.2", optional = true }

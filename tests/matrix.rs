@@ -417,6 +417,7 @@ mod tests {
         assert_eq!(matrix.det(), 49.);
     }
 
+    #[cfg(feature = "gpu")]
     #[test]
     fn bytes() {
         let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
