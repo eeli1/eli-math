@@ -308,4 +308,18 @@ mod tests {
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         vector1.mul_vec(&vector2);
     }
+
+    #[test]
+    fn apply_func() {
+        let mut vector = Vector::new(vec![0.7, 0.2, 0.3]);
+        let step = Box::new(|x: f32| -> f32 {
+            if x > 0.5 {
+                1.
+            } else {
+                0.
+            }
+        });
+        vector.apply_func(step);
+        assert_eq!(vector.vec(), vec![1., 0., 0.]);
+    }
 }

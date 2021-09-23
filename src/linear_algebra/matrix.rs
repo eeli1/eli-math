@@ -749,6 +749,27 @@ impl Matrix {
         todo!();
     }
 
+    /// applyes the lamda function to each value in the matrix
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix = Matrix::new(vec![vec![0.7, 0.2, 0.3], vec![0.5, 0.6, 0.1]]);
+    /// let step = Box::new(|x: f32| -> f32 {
+    ///     if x > 0.5 {
+    ///         1.
+    ///     } else {
+    ///         0.
+    ///     }
+    /// });
+    /// matrix.apply_func_val(step);
+    /// assert_eq!(matrix.matrix_flatt().vec(), vec![1., 0., 0., 0., 1., 0.]);
+    /// ```
+    pub fn apply_func_val(&mut self, lamda: Box<dyn Fn(f32) -> f32>) {
+        self.matrix_flatt.apply_func(lamda);
+    }
+
     // finds the sub matrix is user for the determinant
     fn finde_sub(&self, row: usize, col: usize) -> Self {
         let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));
