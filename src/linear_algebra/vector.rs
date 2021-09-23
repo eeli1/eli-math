@@ -450,7 +450,34 @@ impl Vector {
     /// assert_eq!(vector.index(1), 3.);
     /// ```  
     pub fn index(&self, index: usize) -> f32 {
+        if index > self.len() {
+            panic!(
+                "array out of bouns max len is {} input is {}",
+                index,
+                self.len()
+            );
+        }
         self.vec[index]
+    }
+
+    /// sets the value of the vector at the specifide index
+    ///
+    /// ## Example
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let mut vector = Vector::new(vec![2., 3., 5.]);
+    /// vector.set_index(1, 10.);
+    /// assert_eq!(vector.vec(), vec![2.0, 10.0, 5.0]);
+    /// ```
+    pub fn set_index(&mut self, index: usize, val: f32) {
+        if index > self.len() {
+            panic!(
+                "array out of bouns max len is {} input is {}",
+                index,
+                self.len()
+            );
+        }
+        self.vec[index] = val;
     }
 
     /// this return a vector of bytes representing the vector

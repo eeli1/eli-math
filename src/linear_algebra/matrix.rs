@@ -7,7 +7,7 @@ use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 pub struct Matrix {
     cols: usize,
     rows: usize,
-    matrix_flatt: Vec<f32>,
+    matrix_flatt: Vector,
     is_transpose: bool,
 }
 
@@ -104,7 +104,7 @@ impl Matrix {
         Self {
             cols: cols,
             rows: rows,
-            matrix_flatt: flatt,
+            matrix_flatt: Vector::new(flatt),
             is_transpose: false,
         }
     }
@@ -115,8 +115,9 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3);
-    /// assert_eq!(matrix.matrix_flatt(), vec![3., 2., 4., 4., 5., 6.]);
+    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![3., 2., 4., 4., 5., 6.]));
     /// ```
     pub fn new_flatt(matrix_flatt: Vec<f32>, cols: usize, rows: usize) -> Self {
         if cols * rows != matrix_flatt.len() {
@@ -130,7 +131,7 @@ impl Matrix {
         Self {
             cols,
             rows,
-            matrix_flatt,
+            matrix_flatt: Vector::new(matrix_flatt),
             is_transpose: false,
         }
     }
@@ -141,31 +142,25 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new_rand(2, 3);
     /// assert_eq!(
     ///     matrix.matrix_flatt(),
-    ///     vec![
+    ///     Vector::new(vec![
     ///        0.69186187,
     ///        0.3494884,
     ///        0.23957491,
     ///        0.06540034,
     ///        0.5443042,
     ///        0.013656098,
-    ///    ]
+    ///    ])
     /// );
     /// ```
     pub fn new_rand(cols: usize, rows: usize) -> Self {
-        let mut rand = random::Random::new();
-        let mut matrix_flatt = Vec::with_capacity(cols * rows);
-        for _ in 0..cols {
-            for _ in 0..rows {
-                matrix_flatt.push(rand.f32());
-            }
-        }
         Self {
             cols,
             rows,
-            matrix_flatt,
+            matrix_flatt: Vector::new_rand(cols * rows),
             is_transpose: false,
         }
     }
@@ -176,20 +171,15 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new_zero(2, 3);
-    /// assert_eq!(matrix.matrix_flatt(), vec![0., 0., 0., 0., 0., 0.]);
+    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![0., 0., 0., 0., 0., 0.]));
     /// ```
     pub fn new_zero(cols: usize, rows: usize) -> Self {
-        let mut matrix_flatt = Vec::with_capacity(cols * rows);
-        for _ in 0..cols {
-            for _ in 0..rows {
-                matrix_flatt.push(0.);
-            }
-        }
         Self {
             cols,
             rows,
-            matrix_flatt,
+            matrix_flatt: Vector::new_zero(cols * rows),
             is_transpose: false,
         }
     }
@@ -223,6 +213,7 @@ impl Matrix {
         push_f32_bytes(self.cols() as f32, &mut bytes);
 
         self.matrix_flatt()
+            .vec()
             .iter()
             .for_each(|&val| push_f32_bytes(val, &mut bytes));
         bytes
@@ -234,10 +225,11 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
-    /// assert_eq!(matrix.matrix_flatt(), vec![2., 3., 5., 7., 1., 4.]);
+    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![2., 3., 5., 7., 1., 4.]));
     /// ```
-    pub fn matrix_flatt(&self) -> Vec<f32> {
+    pub fn matrix_flatt(&self) -> Vector {
         if self.is_transpose {
             let mut matrix_flatt = Vec::with_capacity(self.cols * self.rows);
             for i in 0..self.rows {
@@ -245,7 +237,7 @@ impl Matrix {
                     matrix_flatt.push(val);
                 }
             }
-            matrix_flatt
+            Vector::new(matrix_flatt)
         } else {
             self.matrix_flatt.clone()
         }
@@ -274,7 +266,8 @@ impl Matrix {
             panic!("index out of bounds max col {}", self.cols - 1)
         }
 
-        self.matrix_flatt[row * self.rows + col]
+        let index = row * self.rows + col;
+        self.matrix_flatt.index(index)
     }
 
     /// sets the value of the matrix at the specifide index row col
@@ -282,9 +275,10 @@ impl Matrix {
     /// ## Example
     /// ```rust
     /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
     /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
     /// matrix.set_index(0, 1, 10.);
-    /// assert_eq!(matrix.matrix_flatt(), vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]);
+    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]));
     /// ```
     pub fn set_index(&mut self, mut row: usize, mut col: usize, val: f32) {
         if self.is_transpose {
@@ -300,7 +294,8 @@ impl Matrix {
             panic!("index out of bounds max col {}", self.cols - 1)
         }
 
-        self.matrix_flatt[row * self.rows + col] = val;
+        let index = row * self.rows + col;
+        self.matrix_flatt.set_index(index, val);
     }
 
     /// return the length of the columns
@@ -419,7 +414,7 @@ impl Matrix {
     /// );
     /// ```
     pub fn mul_scalar(&mut self, scalar: &f32) {
-        self.matrix_flatt = self.matrix_flatt.iter().map(|x| x * scalar).collect();
+        self.matrix_flatt.mul_scalar(scalar);
     }
 
     /// multiplies each component from the matrix with a scalar value and stors the result in this matrix   
@@ -439,7 +434,7 @@ impl Matrix {
     /// );
     /// ```
     pub fn add_scalar(&mut self, scalar: &f32) {
-        self.matrix_flatt = self.matrix_flatt.iter().map(|x| x + scalar).collect();
+        self.matrix_flatt.add_scalar(scalar);
     }
 
     /// multiplies each component from the matrix with a scalar value and stors the result in this matrix   
@@ -459,7 +454,7 @@ impl Matrix {
     /// );
     /// ```
     pub fn div_scalar(&mut self, scalar: &f32) {
-        self.matrix_flatt = self.matrix_flatt.iter().map(|x| x / scalar).collect();
+        self.matrix_flatt.div_scalar(scalar);
     }
 
     /// multiplies each component from the matrix with a scalar value and stors the result in this matrix   
@@ -479,7 +474,7 @@ impl Matrix {
     /// );
     /// ```
     pub fn sub_scalar(&mut self, scalar: &f32) {
-        self.matrix_flatt = self.matrix_flatt.iter().map(|x| x - scalar).collect();
+        self.matrix_flatt.sub_scalar(scalar);
     }
 
     /// computes the dot product between the vector and this matrix
@@ -810,7 +805,7 @@ impl Matrix {
 
         let mut result: Vec<f32> = Vec::with_capacity(self.cols);
         for i in 0..self.cols {
-            result.push(self.matrix_flatt[i * self.rows + row].clone());
+            result.push(self.matrix_flatt.index(i * self.rows + row));
         }
 
         Vector::new(result)
@@ -823,7 +818,7 @@ impl Matrix {
 
         let mut result: Vec<f32> = Vec::with_capacity(self.rows);
         for i in (col * self.rows)..((1 + col) * self.rows) {
-            result.push(self.matrix_flatt[i].clone());
+            result.push(self.matrix_flatt.index(i));
         }
 
         Vector::new(result)
@@ -859,3 +854,6 @@ fn check_matrix(mat1: &Matrix, mat2: &Matrix) {
         panic!("wrong col shape expected {}, got {}", mat1.cols, mat2.cols)
     }
 }
+
+#[cfg(feature = "gpu")]
+impl Matrix {}

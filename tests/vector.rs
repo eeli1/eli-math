@@ -3,6 +3,13 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    fn set_index() {
+        let mut vector = Vector::new(vec![2., 3., 5.]);
+        vector.set_index(1, 10.);
+        assert_eq!(vector.vec(), vec![2.0, 10.0, 5.0]);
+    }
+
+    #[test]
     fn dist() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8.]);
