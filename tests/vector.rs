@@ -322,4 +322,10 @@ mod tests {
         vector.apply_func(&step);
         assert_eq!(vector.vec(), vec![1., 0., 0.]);
     }
+
+    #[test]
+    fn sum() {
+        let vector = Vector::new(vec![3., 1., 3., 1.]);
+        assert_eq!(vector.sum(), 8.);
+    }
 }

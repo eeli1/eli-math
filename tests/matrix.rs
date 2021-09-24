@@ -584,4 +584,16 @@ mod tests {
         matrix.apply_func_val(&step);
         assert_eq!(matrix.matrix_flatt().vec(), vec![1., 0., 0., 0., 1., 0.]);
     }
+
+    #[test]
+    fn sum() {
+        let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
+        assert_eq!(matrix.sum(), 12.);
+    }
+
+    #[test]
+    fn sum_vec() {
+        let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
+        assert_eq!(matrix.sum_vec(), Vector::new(vec![8.0, 4.0]));
+    }
 }

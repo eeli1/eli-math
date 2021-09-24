@@ -770,6 +770,37 @@ impl Matrix {
         self.matrix_flatt.apply_func(lamda);
     }
 
+    /// returns a vector of the sumed rows
+        ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
+    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
+    /// assert_eq!(matrix.sum_vec(), Vector::new(vec![8., 4.]));
+    /// ```
+    pub fn sum_vec(&self) -> Vector {
+        let mut vec = Vec::new();
+        for i in 0..self.rows() {
+            vec.push(self.row(i).sum());
+        }
+        Vector::new(vec)
+    }
+
+    /// returns the sum of the elements
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
+    /// assert_eq!(matrix.sum(), 12.);
+    /// ```
+    pub fn sum(&self) -> f32 {
+        self.matrix_flatt.sum()
+    }
+
     // finds the sub matrix is user for the determinant
     fn finde_sub(&self, row: usize, col: usize) -> Self {
         let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));

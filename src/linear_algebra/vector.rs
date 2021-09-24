@@ -127,15 +127,15 @@ impl Vector {
     /// ```rust
     /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![0.7, 0.2, 0.3]);
-   /// let step: Box<(dyn Fn(f32) -> f32 + 'static)> = Box::new(|x: f32| -> f32 {
-   ///     if x > 0.5 {
-   ///         1.
-   ///     } else {
-   ///         0.
-   ///     }
-   /// });
-   /// vector.apply_func(&step);
-   /// assert_eq!(vector.vec(), vec![1., 0., 0.]);
+    /// let step: Box<(dyn Fn(f32) -> f32 + 'static)> = Box::new(|x: f32| -> f32 {
+    ///     if x > 0.5 {
+    ///         1.
+    ///     } else {
+    ///         0.
+    ///     }
+    /// });
+    /// vector.apply_func(&step);
+    /// assert_eq!(vector.vec(), vec![1., 0., 0.]);
     /// ```
     pub fn apply_func(&mut self, lamda: &Box<(dyn Fn(f32) -> f32 + 'static)>) {
         for i in 0..self.len() {
@@ -486,6 +486,7 @@ impl Vector {
     /// sets the value of the vector at the specifide index
     ///
     /// ## Example
+    ///
     /// ```rust
     /// use math::linear_algebra::Vector;
     /// let mut vector = Vector::new(vec![2., 3., 5.]);
@@ -501,6 +502,19 @@ impl Vector {
             );
         }
         self.vec[index] = val;
+    }
+
+    /// returns the sum of the elements
+    /// 
+    /// ## Example
+    /// 
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![3., 1., 3., 1.]);
+    /// assert_eq!(vector.sum(), 8.);
+    /// ```
+    pub fn sum(&self) -> f32 {
+        self.vec.iter().sum()
     }
 }
 
