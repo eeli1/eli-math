@@ -109,6 +109,31 @@ impl Matrix {
         }
     }
 
+    /// returns the Matrix of the [outer product] with the vectors
+    /// 
+    /// [outer product]:https://en.wikipedia.org/wiki/Outer_product
+    /// 
+    ///  ```rust
+    /// use math::linear_algebra::Matrix;
+    /// use math::linear_algebra::Vector;
+    /// let vector1 = Vector::new(vec![2., 4., 3.]);
+    /// let vector2 = Vector::new(vec![2., 7., 9.]);
+    /// let matrix = Matrix::new_outer(&vector1,&vector2);
+    /// assert_eq!(matrix, Matrix::new_flatt(vec![4.0, 14.0, 18.0, 8.0, 28.0, 36.0, 6.0, 21.0, 27.0], 3, 3));
+    /// ```
+    pub fn new_outer(vector1: &Vector, vector2: &Vector) -> Self {
+        let mut vec = Vec::new();
+        for i in 0..vector1.len() {
+            let mut temp = Vec::new();
+            for j in 0..vector2.len() {
+                temp.push(vector1.index(i) * vector2.index(j));
+            }
+            vec.push(temp);
+        }
+
+        Self::new(vec)
+    }
+
     /// generats a matrix from a 1D Vector
     ///
     /// ## Example
@@ -771,7 +796,7 @@ impl Matrix {
     }
 
     /// returns a vector of the sumed rows
-        ///
+    ///
     /// ## Example
     ///
     /// ```rust

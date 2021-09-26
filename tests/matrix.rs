@@ -4,6 +4,14 @@ mod tests {
     use math::linear_algebra::Vector;
 
     #[test]
+    fn new_outer() {
+        let vector1 = Vector::new(vec![2., 4., 3.]);
+        let vector2 = Vector::new(vec![2., 7., 9.]);
+        let matrix = Matrix::new_outer(&vector1,&vector2);
+        assert_eq!(matrix, Matrix::new_flatt(vec![4.0, 14.0, 18.0, 8.0, 28.0, 36.0, 6.0, 21.0, 27.0], 3, 3));
+    }
+
+    #[test]
     fn det() {
         // examples from https://www.mathsisfun.com/algebra/matrix-determinant.html
 
