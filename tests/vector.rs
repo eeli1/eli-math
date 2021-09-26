@@ -328,4 +328,10 @@ mod tests {
         let vector = Vector::new(vec![3., 1., 3., 1.]);
         assert_eq!(vector.sum(), 8.);
     }
+
+    #[test]
+    fn new_one_hot() {
+        let vector = Vector::new_one_hot(2, 5);
+        assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
+    }
 }

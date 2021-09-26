@@ -89,6 +89,22 @@ impl Vector {
         Self { vec }
     }
 
+    /// creates a new [one hot] vector
+    /// 
+    /// [one hot]:https://en.wikipedia.org/wiki/One-hot
+    /// 
+    /// ## Example
+    ///
+    /// ```rust
+    /// let vector = Vector::new_one_hot(2, 5);
+    /// assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
+    /// ```
+    pub fn new_one_hot(index: usize, len: usize) -> Self {
+        let mut vector = Self::new_zero(len);
+        vector.set_index(index, 1.);
+        vector
+    }
+
     /// generates a vector of length `len` with random values between 0 and 1
     ///
     /// ## Example
@@ -505,9 +521,9 @@ impl Vector {
     }
 
     /// returns the sum of the elements
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```rust
     /// use math::linear_algebra::Vector;
     /// let vector = Vector::new(vec![3., 1., 3., 1.]);
