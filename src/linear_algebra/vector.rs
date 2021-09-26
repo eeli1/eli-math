@@ -85,17 +85,26 @@ impl DivAssign for Vector {
 
 impl Vector {
     /// creates a new vector
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![1., 2., 3.]);
+    /// assert_eq!(vector.vec(), vec![1., 2., 3.]);
+    /// ```
     pub fn new(vec: Vec<f32>) -> Self {
         Self { vec }
     }
 
     /// creates a new [one hot] vector
-    /// 
+    ///
     /// [one hot]:https://en.wikipedia.org/wiki/One-hot
-    /// 
+    ///
     /// ## Example
     ///
     /// ```rust
+    /// use math::linear_algebra::Vector;
     /// let vector = Vector::new_one_hot(2, 5);
     /// assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
     /// ```
