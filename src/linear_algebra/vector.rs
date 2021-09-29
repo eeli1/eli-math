@@ -189,6 +189,19 @@ impl Vector {
         index
     }
 
+    /// retruns the mean of the vector
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![3., 2., 10., 4.]);
+    /// assert_eq!(vector.mean(), 4.75);
+    /// ```
+    pub fn mean(&self) -> f32 {
+        self.sum() / (self.len() as f32)
+    }
+
     /// returns the angle in degrees between the 2 vectors
     ///   
     /// ## Example

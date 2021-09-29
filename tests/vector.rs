@@ -340,4 +340,10 @@ mod tests {
         let vector = Vector::new(vec![3., 2., 10., 4.]);
         assert_eq!(vector.argmax(), 2);
     }
+
+    #[test]
+    fn mean() {
+        let vector = Vector::new(vec![3., 2., 10., 4.]);
+        assert_eq!(vector.mean(), 4.75);
+    }
 }

@@ -1,14 +1,15 @@
 [package]
-name = "math"
-version = "0.1.0"
 authors = ["eeli1 <maierelias13@gmail.com>"]
 edition = "2018"
+name = "math"
 resolver = "2"
-
+version = "0.1.0"
 
 [features]
-default = ["gpu"]
-gpu = ["wgpu"]
+default = []
+gpu = ["wgpu", "pollster", "bytemuck"]
 
 [dependencies]
-wgpu = { version = "0.10.2", optional = true }
+bytemuck = {version = "1.7", optional = true}
+pollster = {version = "0.2", optional = true}
+wgpu = {version = "0.10.2", optional = true}
