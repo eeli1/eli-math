@@ -637,4 +637,11 @@ mod tests {
         let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
         assert_eq!(matrix.sum_vec(), Vector::new(vec![8.0, 4.0]));
     }
+
+    #[test]
+    fn fmt() {
+        let out = "[1.0, -1.0, 2.0]\n[0.0, -3.0, 1.0]\n";
+        let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
+        assert_eq!(out, format!("{}", matrix));
+    }
 }

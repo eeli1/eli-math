@@ -346,4 +346,11 @@ mod tests {
         let vector = Vector::new(vec![3., 2., 10., 4.]);
         assert_eq!(vector.mean(), 4.75);
     }
+
+    #[test]
+    fn fmt() {
+        let out = "[2.0, 3.0, -6.0, 9.0]";
+        let vector = Vector::new(vec![2., 3., -6., 9.]);
+        assert_eq!(out, format!("{}", vector));
+    }
 }

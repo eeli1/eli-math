@@ -1,5 +1,5 @@
 use crate::random;
-use std::mem;
+use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 fn check_same_len(vec1: &Vector, vec2: &Vector) {
@@ -18,6 +18,12 @@ fn check_same_len(vec1: &Vector, vec2: &Vector) {
 /// the Vector implements many useful mathematical functions
 pub struct Vector {
     vec: Vec<f32>,
+}
+
+impl fmt::Display for Vector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.vec())
+    }
 }
 
 impl Add for Vector {
@@ -576,6 +582,9 @@ impl Vector {
         self.vec.iter().sum()
     }
 }
+
+#[cfg(feature = "gpu")]
+use std::mem;
 
 #[cfg(feature = "gpu")]
 impl Vector {

@@ -1,4 +1,5 @@
 use crate::linear_algebra::Vector;
+use std::fmt;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(Clone, Debug)]
@@ -14,6 +15,17 @@ impl PartialEq for Matrix {
         self.cols() == other.cols()
             && self.rows() == other.rows()
             && self.matrix_flatt() == other.matrix_flatt()
+    }
+}
+
+impl fmt::Display for Matrix {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // writeln!(f, "[")?;
+        for i in 0..self.cols() {
+            writeln!(f, "{}", self.col(i))?;
+        }
+        // writeln!(f, "]")?;
+        Ok(())
     }
 }
 
