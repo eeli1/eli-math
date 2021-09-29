@@ -334,4 +334,10 @@ mod tests {
         let vector = Vector::new_one_hot(2, 5);
         assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
     }
+
+    #[test]
+    fn argmax() {
+        let vector = Vector::new(vec![3., 2., 10., 4.]);
+        assert_eq!(vector.argmax(), 2);
+    }
 }

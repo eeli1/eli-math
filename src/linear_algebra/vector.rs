@@ -168,6 +168,27 @@ impl Vector {
         }
     }
 
+    /// returns the index with the largest element in the vector
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector = Vector::new(vec![3., 2., 10., 4.]);
+    /// assert_eq!(vector.argmax(), 2);
+    /// ```
+    pub fn argmax(&self) -> usize {
+        let mut index = 0;
+        let mut largest = self.vec[0];
+        for (i, &val) in self.vec.iter().enumerate() {
+            if val > largest {
+                largest = val;
+                index = i;
+            }
+        }
+        index
+    }
+
     /// returns the angle in degrees between the 2 vectors
     ///   
     /// ## Example
