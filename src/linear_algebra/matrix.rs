@@ -1,14 +1,20 @@
 use crate::linear_algebra::Vector;
-use crate::random;
-use std::mem;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Matrix {
     cols: usize,
     rows: usize,
     matrix_flatt: Vector,
     is_transpose: bool,
+}
+
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        self.cols() == other.cols()
+            && self.rows() == other.rows()
+            && self.matrix_flatt() == other.matrix_flatt()
+    }
 }
 
 impl Add for Matrix {
@@ -110,9 +116,9 @@ impl Matrix {
     }
 
     /// returns the Matrix of the [outer product] with the vectors
-    /// 
+    ///
     /// [outer product]:https://en.wikipedia.org/wiki/Outer_product
-    /// 
+    ///
     ///  ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
@@ -640,18 +646,31 @@ impl Matrix {
     /// matrix1.sub_mat(&matrix2);
     /// assert_eq!(
     ///   matrix1,
-    ///   Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+    ///   Matrix::new(vec![vec![0.0, -6.0, -4.0], vec![-5.0, -1.0, -5.0]])
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
     pub fn sub_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        for row in 0..self.rows() - 1 {
-            for col in 0..self.cols() - 1 {
+
+        let mut vec = Vec::new();
+
+        let this = self.matrix_flatt().vec();
+        let other = other.matrix_flatt().vec();
+        for i in 0..self.matrix_flatt().len() {
+            vec.push(this[i] - other[i]);
+        }
+
+        self.matrix_flatt = Vector::new(vec);
+
+        /*
+        for row in 0..(self.rows() - 1) {
+            for col in 0..(self.cols() - 1) {
                 let val = self.index(row, col) - other.index(row, col);
                 self.set_index(row, col, val);
             }
         }
+        */
     }
 
     /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
@@ -896,6 +915,11 @@ fn check_matrix(mat1: &Matrix, mat2: &Matrix) {
         panic!("wrong col shape expected {}, got {}", mat1.cols, mat2.cols)
     }
 }
+
+#[cfg(feature = "gpu")]
+use crate::random;
+#[cfg(feature = "gpu")]
+use std::mem;
 
 #[cfg(feature = "gpu")]
 impl Matrix {

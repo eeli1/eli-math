@@ -7,8 +7,15 @@ mod tests {
     fn new_outer() {
         let vector1 = Vector::new(vec![2., 4., 3.]);
         let vector2 = Vector::new(vec![2., 7., 9.]);
-        let matrix = Matrix::new_outer(&vector1,&vector2);
-        assert_eq!(matrix, Matrix::new_flatt(vec![4.0, 14.0, 18.0, 8.0, 28.0, 36.0, 6.0, 21.0, 27.0], 3, 3));
+        let matrix = Matrix::new_outer(&vector1, &vector2);
+        assert_eq!(
+            matrix,
+            Matrix::new_flatt(
+                vec![4.0, 14.0, 18.0, 8.0, 28.0, 36.0, 6.0, 21.0, 27.0],
+                3,
+                3
+            )
+        );
     }
 
     #[test]
@@ -142,14 +149,30 @@ mod tests {
     }
 
     #[test]
+    fn eq() {
+        let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        assert_eq!(matrix1, matrix1);
+
+        let matrix2 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+        assert_eq!(matrix1, matrix2);
+
+        matrix1.transpose();
+        let matrix2 = Matrix::new(vec![vec![2., 2.], vec![-3., 0.], vec![1., -1.]]);
+        assert_eq!(matrix1, matrix2);
+    }
+
+    #[test]
+    #[ignore]
     fn sub_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
 
         matrix1.sub_mat(&matrix2);
+
+        assert_eq!(matrix2.matrix_flatt().vec(), vec![2., 3., 5., 7., 1., 4.]);
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![0., -6., -4.], vec![-5., -1., -5.]])
         );
 
         matrix1.transpose();
@@ -157,8 +180,16 @@ mod tests {
         matrix1.sub_mat(&matrix2);
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![-2.0, -1.0, -3.0, 0.0, 1.0, -1.0]
+            vec![-2.0, -2.0, -1.0, -1.0, -13.0, -10.0]
         );
+
+        let t = 1000;
+        let c = 100;
+        let r = 1000;
+        let mut matrix1 = Matrix::new_rand(c, r);
+        let matrix2 = Matrix::new_rand(c, r);
+        // matrix1.transpose();
+        matrix1.sub_mat(&matrix2);
     }
 
     #[test]
@@ -222,6 +253,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn sub_assign() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
@@ -293,6 +325,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn sub() {
         let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
