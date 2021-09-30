@@ -136,7 +136,7 @@ mod tests {
         matrix1.add_mat(&matrix2);
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]])
         );
 
         matrix1.transpose();
@@ -144,7 +144,7 @@ mod tests {
         matrix1.add_mat(&matrix2);
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![6.0, 5.0, -3.0, 0.0, 1.0, -1.0]
+            vec![6.0, 5.0, 7.0, 2.0, 3.0, 8.0]
         );
     }
 
@@ -162,7 +162,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn sub_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
@@ -177,19 +176,19 @@ mod tests {
 
         matrix1.transpose();
         let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]);
+
         matrix1.sub_mat(&matrix2);
         assert_eq!(
-            matrix1.matrix_flatt().vec(),
-            vec![-2.0, -2.0, -1.0, -1.0, -13.0, -10.0]
+            matrix1,
+            Matrix::new(vec![vec![-2., -1.], vec![-13., -2.], vec![-1., -10.]])
         );
 
-        let t = 1000;
-        let c = 100;
-        let r = 1000;
-        let mut matrix1 = Matrix::new_rand(c, r);
-        let matrix2 = Matrix::new_rand(c, r);
-        // matrix1.transpose();
+        let mut matrix1 = Matrix::new_rand(100, 1000);
+        let matrix2 = Matrix::new_rand(1000, 100);
+        matrix1.transpose();
         matrix1.sub_mat(&matrix2);
+        assert_eq!(matrix1.cols(), 1000);
+        assert_eq!(matrix1.rows(), 100);
     }
 
     #[test]
@@ -200,7 +199,7 @@ mod tests {
         matrix1.mul_mat(&matrix2);
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]])
         );
 
         matrix1.transpose();
@@ -208,7 +207,7 @@ mod tests {
         matrix1.mul_mat(&matrix2);
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![8.0, -56.0, -3.0, 0.0, 1.0, -1.0]
+            vec![8.0, -56.0, -63.0, 0.0, -15.0, -20.0]
         );
     }
 
@@ -220,7 +219,7 @@ mod tests {
         matrix1.div_mat(&matrix2);
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+            Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]])
         );
 
         matrix1.transpose();
@@ -228,7 +227,7 @@ mod tests {
         matrix1.div_mat(&matrix2);
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![0.5, -0.071428575, -3.0, 0.0, 1.0, -1.0]
+            vec![0.5, -0.071428575, -0.14285715, 0.0, -0.06666667, -0.05]
         );
     }
 
@@ -240,7 +239,7 @@ mod tests {
         matrix1 += matrix2;
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]])
         );
 
         matrix1.transpose();
@@ -248,12 +247,11 @@ mod tests {
         matrix1 += matrix2;
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![6.0, 5.0, -3.0, 0.0, 1.0, -1.0]
+            vec![6.0, 5.0, 7.0, 2.0, 3.0, 8.0]
         );
     }
 
     #[test]
-    #[ignore]
     fn sub_assign() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
@@ -261,7 +259,7 @@ mod tests {
         matrix1 -= matrix2;
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![0.0, -6.0, -4.0], vec![-5.0, -1.0, -5.0]])
         );
 
         matrix1.transpose();
@@ -269,7 +267,7 @@ mod tests {
         matrix1 -= matrix2;
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![-2.0, -1.0, -3.0, 0.0, 1.0, -1.0]
+            vec![-2.0, -1.0, -13.0, -2.0, -1.0, -10.0]
         );
     }
 
@@ -281,7 +279,7 @@ mod tests {
         matrix1 *= matrix2;
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]])
         );
 
         matrix1.transpose();
@@ -289,7 +287,7 @@ mod tests {
         matrix1 *= matrix2;
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![8.0, -56.0, -3.0, 0.0, 1.0, -1.0]
+            vec![8.0, -56.0, -63.0, 0.0, -15.0, -20.0]
         );
     }
 
@@ -301,7 +299,7 @@ mod tests {
         matrix1 /= matrix2;
         assert_eq!(
             matrix1,
-            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+            Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]])
         );
 
         matrix1.transpose();
@@ -309,7 +307,7 @@ mod tests {
         matrix1 /= matrix2;
         assert_eq!(
             matrix1.matrix_flatt().vec(),
-            vec![0.5, -0.071428575, -3.0, 0.0, 1.0, -1.0]
+            vec![0.5, -0.071428575, -0.14285715, 0.0, -0.06666667, -0.05]
         );
     }
 
@@ -320,19 +318,18 @@ mod tests {
 
         assert_eq!(
             matrix1 + matrix2,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4., 0., 6.], vec![9., 1., 3.]])
         );
     }
 
     #[test]
-    #[ignore]
     fn sub() {
         let matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
 
         assert_eq!(
             matrix1 - matrix2,
-            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-5.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![0.0, -6.0, -4.0], vec![-5.0, -1.0, -5.0]])
         );
     }
 
@@ -343,7 +340,7 @@ mod tests {
 
         assert_eq!(
             matrix1 * matrix2,
-            Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+            Matrix::new(vec![vec![4., -9., 5.], vec![14., 0., -4.]])
         );
     }
 
@@ -354,7 +351,7 @@ mod tests {
 
         assert_eq!(
             matrix1 / matrix2,
-            Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+            Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]])
         );
     }
 

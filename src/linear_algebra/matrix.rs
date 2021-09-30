@@ -20,11 +20,9 @@ impl PartialEq for Matrix {
 
 impl fmt::Display for Matrix {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // writeln!(f, "[")?;
         for i in 0..self.cols() {
             writeln!(f, "{}", self.col(i))?;
         }
-        // writeln!(f, "]")?;
         Ok(())
     }
 }
@@ -632,21 +630,19 @@ impl Matrix {
     /// matrix1.add_mat(&matrix2);
     /// assert_eq!(
     ///     matrix1,
-    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![9.0, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]])
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
     pub fn add_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        for row in 0..self.rows() - 1 {
-            for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) + other.index(row, col);
-                self.set_index(row, col, val);
-            }
-        }
+        self.matrix_flatt = self.matrix_flatt() + other.matrix_flatt();
+        self.is_transpose = false;
+        self.cols = other.cols();
+        self.rows = other.rows();
     }
 
-    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    /// subtracts each component from the matrix with the component of the other matrix and stors the result in this matrix   
     ///
     /// ## Example
     ///
@@ -664,28 +660,13 @@ impl Matrix {
     /// note it panics if the matrices have not the same rows and cols
     pub fn sub_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-
-        let mut vec = Vec::new();
-
-        let this = self.matrix_flatt().vec();
-        let other = other.matrix_flatt().vec();
-        for i in 0..self.matrix_flatt().len() {
-            vec.push(this[i] - other[i]);
-        }
-
-        self.matrix_flatt = Vector::new(vec);
-
-        /*
-        for row in 0..(self.rows() - 1) {
-            for col in 0..(self.cols() - 1) {
-                let val = self.index(row, col) - other.index(row, col);
-                self.set_index(row, col, val);
-            }
-        }
-        */
+        self.matrix_flatt = self.matrix_flatt() - other.matrix_flatt();
+        self.is_transpose = false;
+        self.cols = other.cols();
+        self.rows = other.rows();
     }
 
-    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    /// divides each component from the matrix with the component of the other matrix and stors the result in this matrix   
     ///
     /// ## Example
     ///
@@ -697,21 +678,19 @@ impl Matrix {
     /// matrix1.div_mat(&matrix2);
     /// assert_eq!(
     ///     matrix1,
-    ///     Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.2857143, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]])
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
     pub fn div_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        for row in 0..self.rows() - 1 {
-            for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) / other.index(row, col);
-                self.set_index(row, col, val);
-            }
-        }
+        self.matrix_flatt = self.matrix_flatt() / other.matrix_flatt();
+        self.is_transpose = false;
+        self.cols = other.cols();
+        self.rows = other.rows();
     }
 
-    /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
+    /// multiples each component from the matrix with the component of the other matrix and stors the result in this matrix   
     ///
     /// ## Example
     ///
@@ -723,18 +702,16 @@ impl Matrix {
     /// matrix1.mul_mat(&matrix2);
     /// assert_eq!(
     ///   matrix1,
-    ///   Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![14.0, 0.0, -1.0]])
+    ///   Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]])
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
     pub fn mul_mat(&mut self, other: &Matrix) {
         check_matrix(self, other);
-        for row in 0..self.rows() - 1 {
-            for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) * other.index(row, col);
-                self.set_index(row, col, val);
-            }
-        }
+        self.matrix_flatt = self.matrix_flatt() * other.matrix_flatt();
+        self.is_transpose = false;
+        self.cols = other.cols();
+        self.rows = other.rows();
     }
 
     /// returns the [determinant] of this matrix
