@@ -21,7 +21,7 @@ impl PartialEq for Matrix {
 impl fmt::Display for Matrix {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for i in 0..self.cols() {
-            writeln!(f, "{}", self.col(i))?;
+            writeln!(f, "{}", self.col(i).unwrap())?;
         }
         Ok(())
     }
@@ -97,32 +97,36 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
     /// ```
     /// crates matrix that looks like this:
     ///
     /// [3.0, 2.0, 4.0]
     /// [4.0, 5.0, 6.0]
     ///
-    pub fn new(vec: Vec<Vec<f32>>) -> Self {
+    pub fn new(vec: Vec<Vec<f32>>) -> Result<Self, String> {
         let cols = vec.len();
         let rows = vec[0].len();
 
         let mut flatt: Vec<f32> = Vec::with_capacity(cols * rows);
 
-        vec.iter().for_each(|col| {
+        for col in vec {
             if col.len() != rows {
-                panic!("wrong row shape expected {}, got {}", rows, col.len())
+                return Err(format!(
+                    "wrong row shape expected {}, got {}",
+                    rows,
+                    col.len()
+                ));
             }
             col.iter().for_each(|&x| flatt.push(x))
-        });
+        }
 
-        Self {
+        Ok(Self {
             cols: cols,
             rows: rows,
             matrix_flatt: Vector::new(flatt),
             is_transpose: false,
-        }
+        })
     }
 
     /// returns the Matrix of the [outer product] with the vectors
@@ -137,12 +141,14 @@ impl Matrix {
     /// let matrix = Matrix::new_outer(&vector1,&vector2);
     /// assert_eq!(matrix, Matrix::new_flatt(vec![4.0, 14.0, 18.0, 8.0, 28.0, 36.0, 6.0, 21.0, 27.0], 3, 3));
     /// ```
-    pub fn new_outer(vector1: &Vector, vector2: &Vector) -> Self {
+    pub fn new_outer(vector1: &Vector, vector2: &Vector) -> Result<Self, String> {
         let mut vec = Vec::new();
         for i in 0..vector1.len() {
             let mut temp = Vec::new();
             for j in 0..vector2.len() {
-                temp.push(vector1.index(i) * vector2.index(j));
+                let index_1 = vector1.index(i)?;
+                let index_2 = vector2.index(j)?;
+                temp.push(index_1 * index_2);
             }
             vec.push(temp);
         }
@@ -157,23 +163,23 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3);
-    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![3., 2., 4., 4., 5., 6.]));
+    /// let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3).unwrap();
+    /// assert_eq!(matrix.matrix_flatt(), Ok(Vector::new(vec![3., 2., 4., 4., 5., 6.])));
     /// ```
-    pub fn new_flatt(matrix_flatt: Vec<f32>, cols: usize, rows: usize) -> Self {
+    pub fn new_flatt(matrix_flatt: Vec<f32>, cols: usize, rows: usize) -> Result<Self, String> {
         if cols * rows != matrix_flatt.len() {
-            panic!(
+            Err(format!(
                 "cols * rows = {} has to be the same len as the matrix_flatt = {}",
                 cols * rows,
                 matrix_flatt.len()
-            );
-        }
-
-        Self {
-            cols,
-            rows,
-            matrix_flatt: Vector::new(matrix_flatt),
-            is_transpose: false,
+            ))
+        } else {
+            Ok(Self {
+                cols,
+                rows,
+                matrix_flatt: Vector::new(matrix_flatt),
+                is_transpose: false,
+            })
         }
     }
 
@@ -187,14 +193,14 @@ impl Matrix {
     /// let matrix = Matrix::new_rand(2, 3);
     /// assert_eq!(
     ///     matrix.matrix_flatt(),
-    ///     Vector::new(vec![
+    ///     Ok(Vector::new(vec![
     ///        0.69186187,
     ///        0.3494884,
     ///        0.23957491,
     ///        0.06540034,
     ///        0.5443042,
     ///        0.013656098,
-    ///    ])
+    ///    ]))
     /// );
     /// ```
     pub fn new_rand(cols: usize, rows: usize) -> Self {
@@ -214,7 +220,7 @@ impl Matrix {
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
     /// let matrix = Matrix::new_zero(2, 3);
-    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![0., 0., 0., 0., 0., 0.]));
+    /// assert_eq!(matrix.matrix_flatt().unwrap(), Vector::new(vec![0., 0., 0., 0., 0., 0.]));
     /// ```
     pub fn new_zero(cols: usize, rows: usize) -> Self {
         Self {
@@ -232,20 +238,20 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
-    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![2., 3., 5., 7., 1., 4.]));
+    /// let matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
+    /// assert_eq!(matrix.matrix_flatt().unwrap(), Vector::new(vec![2., 3., 5., 7., 1., 4.]));
     /// ```
-    pub fn matrix_flatt(&self) -> Vector {
+    pub fn matrix_flatt(&self) -> Result<Vector, String> {
         if self.is_transpose {
             let mut matrix_flatt = Vec::with_capacity(self.cols * self.rows);
             for i in 0..self.rows {
-                for val in self.col(i).vec() {
+                for val in self.col(i)?.vec() {
                     matrix_flatt.push(val);
                 }
             }
-            Vector::new(matrix_flatt)
+            Ok(Vector::new(matrix_flatt))
         } else {
-            self.matrix_flatt.clone()
+            Ok(self.matrix_flatt.clone())
         }
     }
 
@@ -255,10 +261,10 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-    /// assert_eq!(matrix.index(0, 1), 2.);
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
+    /// assert_eq!(matrix.index(0, 1), Ok(2.));
     /// ```
-    pub fn index(&self, mut row: usize, mut col: usize) -> f32 {
+    pub fn index(&self, mut row: usize, mut col: usize) -> Result<f32, String> {
         if self.is_transpose {
             let temp = row;
             row = col;
@@ -266,14 +272,13 @@ impl Matrix {
         }
 
         if self.rows < row {
-            panic!("index out of bounds max row {}", self.rows - 1)
+            Err(format!("index out of bounds max row {}", self.rows - 1))
+        } else if self.cols < col {
+            Err(format!("index out of bounds max col {}", self.cols - 1))
+        } else {
+            let index = row * self.rows + col;
+            self.matrix_flatt.index(index)
         }
-        if self.cols < col {
-            panic!("index out of bounds max col {}", self.cols - 1)
-        }
-
-        let index = row * self.rows + col;
-        self.matrix_flatt.index(index)
     }
 
     /// sets the value of the matrix at the specifide index row col
@@ -282,11 +287,11 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     /// matrix.set_index(0, 1, 10.);
-    /// assert_eq!(matrix.matrix_flatt(), Vector::new(vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]));
+    /// assert_eq!(matrix.matrix_flatt(), Ok(Vector::new(vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0])));
     /// ```
-    pub fn set_index(&mut self, mut row: usize, mut col: usize, val: f32) {
+    pub fn set_index(&mut self, mut row: usize, mut col: usize, val: f32) -> Option<String> {
         if self.is_transpose {
             let temp = row;
             row = col;
@@ -294,14 +299,13 @@ impl Matrix {
         }
 
         if self.rows < row + 1 {
-            panic!("index out of bounds max row {}", self.rows - 1)
+            Some(format!("index out of bounds max row {}", self.rows - 1))
+        } else if self.cols < col + 1 {
+            Some(format!("index out of bounds max col {}", self.cols - 1))
+        } else {
+            let index = row * self.rows + col;
+            self.matrix_flatt.set_index(index, val)
         }
-        if self.cols < col + 1 {
-            panic!("index out of bounds max col {}", self.cols - 1)
-        }
-
-        let index = row * self.rows + col;
-        self.matrix_flatt.set_index(index, val);
     }
 
     /// return the length of the columns
@@ -310,7 +314,7 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
     /// assert_eq!(matrix.cols(), 2);
     /// ```
     pub fn cols(&self) -> usize {
@@ -327,7 +331,7 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
     /// assert_eq!(matrix.rows(), 3);
     /// ```
     pub fn rows(&self) -> usize {
@@ -345,10 +349,10 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-    /// assert_eq!(matrix.col(0), Vector::new(vec![3., 2., 4.]));
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
+    /// assert_eq!(matrix.col(0), Ok(Vector::new(vec![3., 2., 4.])));
     /// ```
-    pub fn col(&self, col: usize) -> Vector {
+    pub fn col(&self, col: usize) -> Result<Vector, String> {
         if self.is_transpose {
             self.get_row(col)
         } else {
@@ -363,10 +367,10 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]);
-    /// assert_eq!(matrix.row(0), Vector::new(vec![3., 4.]));
+    /// let matrix = Matrix::new(vec![vec![3., 2., 4.], vec![4., 5., 6.]]).unwrap();
+    /// assert_eq!(matrix.row(0), Ok(Vector::new(vec![3., 4.])));
     /// ```
-    pub fn row(&self, row: usize) -> Vector {
+    pub fn row(&self, row: usize) -> Result<Vector, String> {
         if self.is_transpose {
             self.get_col(row)
         } else {
@@ -384,19 +388,38 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]);
+    /// let matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]).unwrap();
     /// assert_eq!(matrix.is_square(), true);
     /// ```
     pub fn is_square(&self) -> bool {
         self.cols() == self.rows()
     }
 
-    /// getter for the transpose
+    /// a getter for the [transpose]
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]).unwrap();
+    /// assert_eq!(matrix.is_transpose(), false);
+    /// ```
+    ///
+    /// [transpose]: https://en.wikipedia.org/wiki/Transpose
     pub fn is_transpose(&self) -> bool {
         self.is_transpose
     }
 
     /// [transposes] matrix flips rows and cols
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let mut matrix = Matrix::new(vec![vec![3., 2.], vec![4., 5.]]).unwrap();
+    /// matrix.transpose();
+    /// assert_eq!(matrix.is_transpose(), true);
+    /// ```
     ///
     /// [transposes]: https://en.wikipedia.org/wiki/Transpose
     pub fn transpose(&mut self) {
@@ -409,14 +432,14 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     /// matrix.mul_scalar(&2.);
     /// assert_eq!(
     ///     matrix,
     ///     Matrix::new(vec![
     ///         vec![2. * 2., 3. * 2., 5. * 2.],
     ///         vec![7. * 2., 1. * 2., 4. * 2.]
-    ///     ])
+    ///     ]).unwrap()
     /// );
     /// ```
     pub fn mul_scalar(&mut self, scalar: &f32) {
@@ -429,14 +452,14 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     /// matrix.add_scalar(&2.);
     /// assert_eq!(
     ///     matrix,
     ///     Matrix::new(vec![
     ///         vec![2. + 2., 3. + 2., 5. + 2.],
     ///         vec![7. + 2., 1. + 2., 4. + 2.]
-    ///     ])
+    ///     ]).unwrap()
     /// );
     /// ```
     pub fn add_scalar(&mut self, scalar: &f32) {
@@ -449,14 +472,14 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     /// matrix.div_scalar(&2.);
     /// assert_eq!(
     ///     matrix,
     ///     Matrix::new(vec![
     ///         vec![2. / 2., 3. / 2., 5. / 2.],
     ///         vec![7. / 2., 1. / 2., 4. / 2.]
-    ///     ])
+    ///     ]).unwrap()
     /// );
     /// ```
     pub fn div_scalar(&mut self, scalar: &f32) {
@@ -469,14 +492,14 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     /// matrix.sub_scalar(&2.);
     /// assert_eq!(
     ///     matrix,
     ///     Matrix::new(vec![
     ///         vec![2. - 2., 3. - 2., 5. - 2.],
     ///         vec![7. - 2., 1. - 2., 4. - 2.]
-    ///     ])
+    ///     ]).unwrap()
     /// );
     /// ```
     pub fn sub_scalar(&mut self, scalar: &f32) {
@@ -490,28 +513,25 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]);
+    /// let matrix = Matrix::new(vec![vec![1., -1., 2.], vec![0., -3., 1.]]).unwrap();
     /// assert_eq!(
     ///     matrix.dot_vec(&Vector::new(vec![2., 1., 0.])),
-    ///     Vector::new(vec![1., -3.])
+    ///     Ok(Vector::new(vec![1., -3.]))
     /// );
     /// ```
-    pub fn dot_vec(&self, vector: &Vector) -> Vector {
+    pub fn dot_vec(&self, vector: &Vector) -> Result<Vector, String> {
         let vec = vector.vec();
-        check_vector(self, vector);
+        if let Some(err) = check_vector(self, vector) {
+            return Err(err);
+        }
 
         let mut result: Vec<f32> = Vec::with_capacity(self.cols());
         for i in 0..self.cols() {
-            result.push(
-                self.col(i)
-                    .vec()
-                    .iter()
-                    .enumerate()
-                    .map(|(j, x)| vec[j] * x)
-                    .sum(),
-            );
+            let col = self.col(i)?;
+            let sum = col.vec().iter().enumerate().map(|(j, x)| vec[j] * x).sum();
+            result.push(sum);
         }
-        Vector::new(result)
+        Ok(Vector::new(result))
     }
 
     /// adds each component from the vector with the component of the other matrix and stors the result in this matrix   
@@ -521,23 +541,34 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
     /// let vector = Vector::new(vec![2., 4., 6.]);
     /// matrix.add_vec(&vector);
     /// assert_eq!(
     ///     matrix,
-    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![6.0, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![6.0, 0.0, -1.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn add_vec(&mut self, vector: &Vector) {
-        check_vector(self, vector);
+    pub fn add_vec(&mut self, vector: &Vector) -> Option<String> {
+        if let Some(err) = check_vector(self, vector) {
+            return Some(err);
+        }
         for row in 0..self.rows() - 1 {
             for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) + vector.index(row);
-                self.set_index(row, col, val);
+                let val;
+                match (vector.index(row), self.index(row, col)) {
+                    (Ok(vector), Ok(mat)) => val = mat + vector,
+                    (_, Err(err)) => return Some(err),
+                    (Err(err), _) => return Some(err),
+                };
+
+                if let Some(err) = self.set_index(row, col, val) {
+                    return Some(err);
+                }
             }
         }
+        None
     }
 
     /// subtracts each component from the vector with the component of the other matrix and stors the result in this matrix   
@@ -547,23 +578,34 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
     /// let vector = Vector::new(vec![2., 4., 6.]);
     /// matrix.sub_vec(&vector);
     /// assert_eq!(
     ///     matrix,
-    ///     Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-2.0, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-2.0, 0.0, -1.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn sub_vec(&mut self, vector: &Vector) {
-        check_vector(self, vector);
+    pub fn sub_vec(&mut self, vector: &Vector) -> Option<String> {
+        if let Some(err) = check_vector(self, vector) {
+            return Some(err);
+        }
         for row in 0..self.rows() - 1 {
             for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) - vector.index(row);
-                self.set_index(row, col, val);
+                let val;
+                match (vector.index(row), self.index(row, col)) {
+                    (Ok(vector), Ok(mat)) => val = mat - vector,
+                    (_, Err(err)) => return Some(err),
+                    (Err(err), _) => return Some(err),
+                };
+
+                if let Some(err) = self.set_index(row, col, val) {
+                    return Some(err);
+                }
             }
         }
+        None
     }
 
     /// multiplys each component from the vector with the component of the other matrix and stors the result in this matrix   
@@ -573,23 +615,34 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
     /// let vector = Vector::new(vec![2., 4., 6.]);
     /// matrix.mul_vec(&vector);
     /// assert_eq!(
     ///     matrix,
-    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![8.0, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![4.0, -3.0, 1.0], vec![8.0, 0.0, -1.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn mul_vec(&mut self, vector: &Vector) {
-        check_vector(self, vector);
+    pub fn mul_vec(&mut self, vector: &Vector) -> Option<String> {
+        if let Some(err) = check_vector(self, vector) {
+            return Some(err);
+        }
         for row in 0..self.rows() - 1 {
             for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) * vector.index(row);
-                self.set_index(row, col, val);
+                let val;
+                match (vector.index(row), self.index(row, col)) {
+                    (Ok(vector), Ok(mat)) => val = mat * vector,
+                    (_, Err(err)) => return Some(err),
+                    (Err(err), _) => return Some(err),
+                };
+
+                if let Some(err) = self.set_index(row, col, val) {
+                    return Some(err);
+                }
             }
         }
+        None
     }
 
     /// divides each component from the vector with the component of the other matrix and stors the result in this matrix   
@@ -599,23 +652,34 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
+    /// let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
     /// let vector = Vector::new(vec![2., 4., 6.]);
     /// matrix.div_vec(&vector);
     /// assert_eq!(
     ///     matrix,
-    ///     Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.5, 0.0, -1.0]])
+    ///     Matrix::new(vec![vec![1.0, -3.0, 1.0], vec![0.5, 0.0, -1.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn div_vec(&mut self, vector: &Vector) {
-        check_vector(self, vector);
+    pub fn div_vec(&mut self, vector: &Vector) -> Option<String> {
+        if let Some(err) = check_vector(self, vector) {
+            return Some(err);
+        }
         for row in 0..self.rows() - 1 {
             for col in 0..self.cols() - 1 {
-                let val = self.index(row, col) / vector.index(row);
-                self.set_index(row, col, val);
+                let val;
+                match (vector.index(row), self.index(row, col)) {
+                    (Ok(vector), Ok(mat)) => val = mat / vector,
+                    (_, Err(err)) => return Some(err),
+                    (Err(err), _) => return Some(err),
+                };
+
+                if let Some(err) = self.set_index(row, col, val) {
+                    return Some(err);
+                }
             }
         }
+        None
     }
 
     /// adds each component from the matrix with the component of the other matrix and stors the result in this matrix   
@@ -624,22 +688,34 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
-    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     ///
     /// matrix1.add_mat(&matrix2);
     /// assert_eq!(
     ///     matrix1,
-    ///     Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]])
+    ///     Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn add_mat(&mut self, other: &Matrix) {
-        check_matrix(self, other);
-        self.matrix_flatt = self.matrix_flatt() + other.matrix_flatt();
+    pub fn add_mat(&mut self, other: &Matrix) -> Option<String> {
+        if let Some(err) = check_matrix(self, other) {
+            return Some(err);
+        }
+
+        let self_flatt = match self.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        let other_flatt = match other.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        self.matrix_flatt = self_flatt + other_flatt;
         self.is_transpose = false;
         self.cols = other.cols();
         self.rows = other.rows();
+        None
     }
 
     /// subtracts each component from the matrix with the component of the other matrix and stors the result in this matrix   
@@ -648,22 +724,33 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
-    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     ///
     /// matrix1.sub_mat(&matrix2);
     /// assert_eq!(
     ///   matrix1,
-    ///   Matrix::new(vec![vec![0.0, -6.0, -4.0], vec![-5.0, -1.0, -5.0]])
+    ///   Matrix::new(vec![vec![0.0, -6.0, -4.0], vec![-5.0, -1.0, -5.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn sub_mat(&mut self, other: &Matrix) {
-        check_matrix(self, other);
-        self.matrix_flatt = self.matrix_flatt() - other.matrix_flatt();
+    pub fn sub_mat(&mut self, other: &Matrix) -> Option<String> {
+        if let Some(err) = check_matrix(self, other) {
+            return Some(err);
+        }
+        let self_flatt = match self.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        let other_flatt = match other.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        self.matrix_flatt = self_flatt - other_flatt;
         self.is_transpose = false;
         self.cols = other.cols();
         self.rows = other.rows();
+        None
     }
 
     /// divides each component from the matrix with the component of the other matrix and stors the result in this matrix   
@@ -672,22 +759,33 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
-    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     ///
     /// matrix1.div_mat(&matrix2);
     /// assert_eq!(
     ///     matrix1,
-    ///     Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]])
+    ///     Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn div_mat(&mut self, other: &Matrix) {
-        check_matrix(self, other);
-        self.matrix_flatt = self.matrix_flatt() / other.matrix_flatt();
+    pub fn div_mat(&mut self, other: &Matrix) -> Option<String> {
+        if let Some(err) = check_matrix(self, other) {
+            return Some(err);
+        }
+        let self_flatt = match self.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        let other_flatt = match other.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        self.matrix_flatt = self_flatt / other_flatt;
         self.is_transpose = false;
         self.cols = other.cols();
         self.rows = other.rows();
+        None
     }
 
     /// multiples each component from the matrix with the component of the other matrix and stors the result in this matrix   
@@ -696,22 +794,33 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]);
-    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]);
+    /// let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
+    /// let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
     ///
     /// matrix1.mul_mat(&matrix2);
     /// assert_eq!(
     ///   matrix1,
-    ///   Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]])
+    ///   Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]]).unwrap()
     /// );
     /// ```
     /// note it panics if the matrices have not the same rows and cols
-    pub fn mul_mat(&mut self, other: &Matrix) {
-        check_matrix(self, other);
-        self.matrix_flatt = self.matrix_flatt() * other.matrix_flatt();
+    pub fn mul_mat(&mut self, other: &Matrix) -> Option<String> {
+        if let Some(err) = check_matrix(self, other) {
+            return Some(err);
+        }
+        let self_flatt = match self.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        let other_flatt = match other.matrix_flatt() {
+            Ok(flatt) => flatt,
+            Err(err) => return Some(err),
+        };
+        self.matrix_flatt = self_flatt * other_flatt;
         self.is_transpose = false;
         self.cols = other.cols();
         self.rows = other.rows();
+        None
     }
 
     /// returns the [determinant] of this matrix
@@ -722,27 +831,29 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]);
-    /// assert_eq!(matrix.det(), -2.);
+    /// let matrix = Matrix::new(vec![vec![1., 2.], vec![3., 4.]]).unwrap();
+    /// assert_eq!(matrix.det(), Ok(-2.));
     /// ```
     ///  note the matrix has to be a [square matrix]
     ///
     /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
-    pub fn det(&self) -> f32 {
-        check_square(self);
+    pub fn det(&self) -> Result<f32, String> {
+        if let Some(err) = check_square(self) {
+            return Err(err);
+        }
         if self.rows() == 2 {
-            self.index(0, 0) * self.index(1, 1) - self.index(1, 0) * self.index(0, 1)
+            Ok(self.index(0, 0)? * self.index(1, 1)? - self.index(0, 1)? * self.index(1, 0)?)
         } else {
             let mut sign = 1.;
             let mut sum = 0.;
 
             for col in 0..self.cols() {
-                let sub = self.finde_sub(0, col);
-                sum += sub.det() * sign * self.index(0, col);
+                let sub = self.finde_sub(0, col)?;
+                sum += sub.det()? * sign * self.index(0, col)?;
                 sign *= -1.;
             }
 
-            sum
+            Ok(sum)
         }
     }
 
@@ -758,26 +869,38 @@ impl Matrix {
     /// note the matrix has to be a [square matrix]
     ///
     /// [square matrix]: https://en.wikipedia.org/wiki/Square_matrix
-    pub fn eigen_val(&self) -> f32 {
-        check_square(self);
+    pub fn eigen_val(&self) -> Result<f32, String> {
+        if let Some(err) = check_square(self) {
+            return Err(err);
+        }
         todo!();
     }
 
-    pub fn eigen_vec(&self) -> Vector {
-        check_square(self);
+    pub fn eigen_vec(&self) -> Result<Vector, String> {
+        if let Some(err) = check_square(self) {
+            return Err(err);
+        }
         todo!();
     }
 
-    pub fn dot_mat(&self, other: &Matrix) {
-        check_matrix(self, other);
+    pub fn dot_mat(&self, other: &Matrix) -> Option<String> {
+        if let Some(err) = check_matrix(self, other) {
+            return Some(err);
+        }
         todo!();
     }
 
-    pub fn inv(&mut self) {
-        check_square(self);
-        let det = self.det();
+    pub fn inv(&mut self) -> Option<String> {
+        if let Some(err) = check_square(self) {
+            return Some(err);
+        }
+        let det = match self.det() {
+            Ok(det) => det,
+            Err(err) => return Some(err),
+        };
+
         if det == 0. {
-            panic!("the determinant of the matrix can't be 0")
+            return Some(format!("the determinant of the matrix can't be 0"));
         }
         todo!();
     }
@@ -788,7 +911,7 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let mut matrix = Matrix::new(vec![vec![0.7, 0.2, 0.3], vec![0.5, 0.6, 0.1]]);
+    /// let mut matrix = Matrix::new(vec![vec![0.7, 0.2, 0.3], vec![0.5, 0.6, 0.1]]).unwrap();
     /// let step: Box<(dyn Fn(f32) -> f32 + 'static)> = Box::new(|x: f32| -> f32 {
     ///     if x > 0.5 {
     ///         1.
@@ -797,7 +920,7 @@ impl Matrix {
     ///     }
     /// });
     /// matrix.apply_func_val(&step);
-    /// assert_eq!(matrix.matrix_flatt().vec(), vec![1., 0., 0., 0., 1., 0.]);
+    /// assert_eq!(matrix.matrix_flatt().unwrap().vec(), vec![1., 0., 0., 0., 1., 0.]);
     /// ```
     pub fn apply_func_val(&mut self, lamda: &Box<(dyn Fn(f32) -> f32 + 'static)>) {
         self.matrix_flatt.apply_func(lamda);
@@ -810,15 +933,16 @@ impl Matrix {
     /// ```rust
     /// use math::linear_algebra::Matrix;
     /// use math::linear_algebra::Vector;
-    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
-    /// assert_eq!(matrix.sum_vec(), Vector::new(vec![8., 4.]));
+    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]).unwrap();
+    /// assert_eq!(matrix.sum_vec(), Ok(Vector::new(vec![8., 4.])));
     /// ```
-    pub fn sum_vec(&self) -> Vector {
+    pub fn sum_vec(&self) -> Result<Vector, String> {
         let mut vec = Vec::new();
         for i in 0..self.rows() {
-            vec.push(self.row(i).sum());
+            let sum = self.row(i)?.sum();
+            vec.push(sum);
         }
-        Vector::new(vec)
+        Ok(Vector::new(vec))
     }
 
     /// returns the sum of the elements
@@ -827,7 +951,7 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]);
+    /// let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]).unwrap();
     /// assert_eq!(matrix.sum(), 12.);
     /// ```
     pub fn sum(&self) -> f32 {
@@ -835,73 +959,83 @@ impl Matrix {
     }
 
     // finds the sub matrix is user for the determinant
-    fn finde_sub(&self, row: usize, col: usize) -> Self {
+    fn finde_sub(&self, row: usize, col: usize) -> Result<Self, String> {
         let mut flatt = Vec::with_capacity((self.cols() - 1) * (self.rows() - 1));
 
         for i in 0..self.cols() {
             for j in 0..self.rows() {
                 if !(i == col || j == row) {
-                    flatt.push(self.index(i, j));
+                    flatt.push(self.index(i, j)?);
                 }
             }
         }
         Self::new_flatt(flatt, self.cols() - 1, self.rows() - 1)
     }
 
-    fn get_row(&self, row: usize) -> Vector {
+    fn get_row(&self, row: usize) -> Result<Vector, String> {
         if self.rows < row + 1 {
-            panic!("index out of bounds max row {}", self.rows - 1)
-        }
+            Err(format!("index out of bounds max row {}", self.rows - 1))
+        } else {
+            let mut result: Vec<f32> = Vec::with_capacity(self.cols);
+            for i in 0..self.cols {
+                let index = self.matrix_flatt.index(i * self.rows + row)?;
+                result.push(index);
+            }
 
-        let mut result: Vec<f32> = Vec::with_capacity(self.cols);
-        for i in 0..self.cols {
-            result.push(self.matrix_flatt.index(i * self.rows + row));
+            Ok(Vector::new(result))
         }
-
-        Vector::new(result)
     }
 
-    fn get_col(&self, col: usize) -> Vector {
+    fn get_col(&self, col: usize) -> Result<Vector, String> {
         if self.cols < col + 1 {
-            panic!("index out of bounds max col {}", self.cols - 1)
-        }
+            Err(format!("index out of bounds max col {}", self.cols - 1))
+        } else {
+            let mut result: Vec<f32> = Vec::with_capacity(self.rows);
+            for i in (col * self.rows)..((1 + col) * self.rows) {
+                let index = self.matrix_flatt.index(i)?;
+                result.push(index);
+            }
 
-        let mut result: Vec<f32> = Vec::with_capacity(self.rows);
-        for i in (col * self.rows)..((1 + col) * self.rows) {
-            result.push(self.matrix_flatt.index(i));
+            Ok(Vector::new(result))
         }
-
-        Vector::new(result)
     }
 }
 
-fn check_square(mat: &Matrix) {
+fn check_square(mat: &Matrix) -> Option<String> {
     if !mat.is_square() {
-        panic!("the matrix has to be a square matrix");
-    }
-
-    if mat.rows() == 1 {
-        panic!("the matrix has to have more then one row");
+        Some(format!("the matrix has to be a square matrix"))
+    } else if mat.rows() == 1 {
+        Some(format!("the matrix has to have more then one row"))
+    } else {
+        None
     }
 }
 
-fn check_vector(mat: &Matrix, vec: &Vector) {
+fn check_vector(mat: &Matrix, vec: &Vector) -> Option<String> {
     if vec.len() != mat.rows() {
-        panic!(
+        Some(format!(
             "wrong vector shape expected {}, got {}",
             mat.rows,
             vec.len()
-        )
+        ))
+    } else {
+        None
     }
 }
 
-fn check_matrix(mat1: &Matrix, mat2: &Matrix) {
+fn check_matrix(mat1: &Matrix, mat2: &Matrix) -> Option<String> {
     if mat1.rows() != mat2.rows() {
-        panic!("wrong row shape expected {}, got {}", mat1.rows, mat2.rows)
-    }
-
-    if mat1.cols() != mat2.cols() {
-        panic!("wrong col shape expected {}, got {}", mat1.cols, mat2.cols)
+        Some(format!(
+            "wrong row shape expected {}, got {}",
+            mat1.rows, mat2.rows
+        ))
+    } else if mat1.cols() != mat2.cols() {
+        Some(format!(
+            "wrong col shape expected {}, got {}",
+            mat1.cols, mat2.cols
+        ))
+    } else {
+        None
     }
 }
 

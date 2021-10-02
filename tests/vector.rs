@@ -120,36 +120,41 @@ mod tests {
     #[test]
     fn index_vec() {
         let vector = Vector::new(vec![1., 3., 6.]);
-        assert_eq!(vector.index(1), 3.);
+        assert_eq!(vector.index(1), Ok(3.));
     }
 
     #[test]
     fn cross_vec() {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
-        assert_eq!(vector1.cross_vec(&vector2), Vector::new(vec![0., 0., 1.]));
+        assert_eq!(
+            vector1.cross_vec(&vector2),
+            Ok(Vector::new(vec![0., 0., 1.]))
+        );
     }
 
     #[test]
-    #[should_panic(expected = "this only works with 3 dimensional vectors")]
-    fn cross_vec_panic() {
+    fn cross_vec_err() {
         let vector1 = Vector::new(vec![1., 0., 0., 2.]);
         let vector2 = Vector::new(vec![0., 1., 0., 2.]);
-        let _ = vector1.cross_vec(&vector2);
+        assert_eq!(
+            vector1.cross_vec(&vector2),
+            Err("this only works with 3 dimensional vectors".to_string())
+        );
     }
 
     #[test]
     fn angle() {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
-        assert_eq!(vector1.angle(&vector2), 90.);
+        assert_eq!(vector1.angle(&vector2), Ok(90.));
     }
 
     #[test]
     fn rot() {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
-        assert_eq!(vector1.rot(&vector2), 1.5707964);
+        assert_eq!(vector1.rot(&vector2), Ok(1.5707964));
     }
 
     #[cfg(feature = "gpu")]
@@ -224,17 +229,20 @@ mod tests {
     fn dot_vec() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8.]);
-        assert_eq!(vector1.dot_vec(&vector2), 38.);
+        assert_eq!(vector1.dot_vec(&vector2), Ok(38.));
     }
 
     #[test]
-    #[should_panic(
-        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
-    )]
-    fn dot_vec_panic() {
+
+    fn dot_vec_err() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8., 1.]);
-        vector1.dot_vec(&vector2);
+        assert_eq!(
+            vector1.dot_vec(&vector2),
+            Err(
+                "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
+            )
+        );
     }
 
     #[test]
@@ -243,16 +251,15 @@ mod tests {
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.mul_vec(&vector2);
         assert_eq!(vector1, Vector::new(vec![0. * 3., 2. * 1., 3. * 3.]));
-    }
 
-    #[test]
-    #[should_panic(
-        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
-    )]
-    fn mul_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
-        vector1.mul_vec(&vector2);
+        assert_eq!(
+            vector1.mul_vec(&vector2),
+            Some(
+                "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
+            )
+        );
     }
 
     #[test]
@@ -261,16 +268,15 @@ mod tests {
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.add_vec(&vector2);
         assert_eq!(vector1, Vector::new(vec![0. + 3., 2. + 1., 3. + 3.]));
-    }
 
-    #[test]
-    #[should_panic(
-        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
-    )]
-    fn add_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
-        vector1.add_vec(&vector2);
+        assert_eq!(
+            vector1.add_vec(&vector2),
+            Some(
+                "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
+            )
+        );
     }
 
     #[test]
@@ -279,16 +285,15 @@ mod tests {
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.sub_vec(&vector2);
         assert_eq!(vector1, Vector::new(vec![0. - 3., 2. - 1., 3. - 3.]));
-    }
 
-    #[test]
-    #[should_panic(
-        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
-    )]
-    fn sub_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
-        vector1.sub_vec(&vector2);
+        assert_eq!(
+            vector1.sub_vec(&vector2),
+            Some(
+                "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
+            )
+        );
     }
 
     #[test]
@@ -297,16 +302,15 @@ mod tests {
         let vector2 = Vector::new(vec![3., 1., 3.]);
         vector1.div_vec(&vector2);
         assert_eq!(vector1, Vector::new(vec![0. / 3., 2. / 1., 3. / 3.]));
-    }
 
-    #[test]
-    #[should_panic(
-        expected = "the other vector has not the same len self.len() = 3, other.len() = 4"
-    )]
-    fn div_vec_panic() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
-        vector1.mul_vec(&vector2);
+        assert_eq!(
+            vector1.div_vec(&vector2),
+            Some(
+                "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
+            )
+        );
     }
 
     #[test]
