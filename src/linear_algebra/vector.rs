@@ -336,8 +336,8 @@ impl Vector {
 
             Ok(Vector::new(vec![
                 self_1 * other_2 - self_2 * other_1,
-                self_2 * self_0 - self_0 * other_2,
-                self_0 * other_1 - self_1 * self_0,
+                self_2 * other_0 - self_0 * other_2,
+                self_0 * other_1 - self_1 * other_0,
             ]))
         }
     }
