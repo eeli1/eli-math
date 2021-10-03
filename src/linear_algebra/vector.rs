@@ -20,14 +20,14 @@ impl Add for Vector {
     type Output = Self;
     fn add(self, other: Self) -> Self {
         let mut result = self.clone();
-        result.add_vec(&other);
+        result.add_vec(&other).unwrap();
         result
     }
 }
 
 impl AddAssign for Vector {
     fn add_assign(&mut self, other: Self) {
-        self.add_vec(&other);
+        self.add_vec(&other).unwrap();
     }
 }
 
@@ -36,14 +36,14 @@ impl Sub for Vector {
 
     fn sub(self, other: Self) -> Self {
         let mut result = self.clone();
-        result.sub_vec(&other);
+        result.sub_vec(&other).unwrap();
         result
     }
 }
 
 impl SubAssign for Vector {
     fn sub_assign(&mut self, other: Self) {
-        self.sub_vec(&other);
+        self.sub_vec(&other).unwrap();
     }
 }
 
@@ -52,14 +52,14 @@ impl Mul for Vector {
 
     fn mul(self, other: Self) -> Self {
         let mut result = self.clone();
-        result.mul_vec(&other);
+        result.mul_vec(&other).unwrap();
         result
     }
 }
 
 impl MulAssign for Vector {
     fn mul_assign(&mut self, other: Self) {
-        self.mul_vec(&other);
+        self.mul_vec(&other).unwrap();
     }
 }
 
@@ -68,14 +68,14 @@ impl Div for Vector {
 
     fn div(self, other: Self) -> Self {
         let mut result = self.clone();
-        result.div_vec(&other);
+        result.div_vec(&other).unwrap();
         result
     }
 }
 
 impl DivAssign for Vector {
     fn div_assign(&mut self, other: Self) {
-        self.div_vec(&other);
+        self.div_vec(&other).unwrap();
     }
 }
 
@@ -101,13 +101,13 @@ impl Vector {
     ///
     /// ```rust
     /// use math::linear_algebra::Vector;
-    /// let vector = Vector::new_one_hot(2, 5);
+    /// let vector = Vector::new_one_hot(2, 5).unwrap();
     /// assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
     /// ```
-    pub fn new_one_hot(index: usize, len: usize) -> Self {
+    pub fn new_one_hot(index: usize, len: usize) -> Result<Self, String> {
         let mut vector = Self::new_zero(len);
-        vector.set_index(index, 1.);
-        vector
+        vector.set_index(index, 1.)?;
+        Ok(vector)
     }
 
     /// generates a vector of length `len` with random values between 0 and 1
@@ -264,15 +264,32 @@ impl Vector {
     /// use math::linear_algebra::Vector;
     /// let vector1 = Vector::new(vec![2., 7., 1.]);
     /// let vector2 = Vector::new(vec![8., 2., 8.]);
-    /// assert_eq!(vector1.dist(&vector2), 10.488089);
+    /// assert_eq!(vector1.dist(&vector2), Ok(10.488089));
     /// ```
-    pub fn dist(&self, other: &Vector) -> f32 {
-        check_same_len(self, other);
+    pub fn dist(&self, other: &Vector) -> Result<f32, String> {
+        let res = self.dist_sq(other)?;
+        Ok(res.sqrt())
+    }
+
+    /// calculates the [Euclidean distance] squared between 2 vectors
+    ///
+    /// [Euclidean distance]:https://en.wikipedia.org/wiki/Euclidean_distance
+    ///   
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let vector1 = Vector::new(vec![2., 7., 1.]);
+    /// let vector2 = Vector::new(vec![8., 2., 8.]);
+    /// assert_eq!(vector1.dist_sq(&vector2), Ok(110.0));
+    /// ```
+    pub fn dist_sq(&self, other: &Vector) -> Result<f32, String> {
+        check_same_len(self, other)?;
         let mut res = 0.;
         for i in 0..self.vec.len() {
             res += (self.vec[i] - other.vec()[i]) * (self.vec[i] - other.vec()[i]);
         }
-        res.sqrt()
+        Ok(res)
     }
 
     /// Limit the magnitude of this vector to the value used for the `max` parameter
@@ -356,9 +373,7 @@ impl Vector {
     /// ```
     /// note it panics if the vectors have not the same len  
     pub fn dot_vec(&self, other: &Vector) -> Result<f32, String> {
-        if let Some(err) = check_same_len(self, other) {
-            return Err(err);
-        }
+        check_same_len(self, other)?;
         let mut res = 0.;
         for i in 0..self.vec.len() {
             res += self.vec[i] * other.vec()[i];
@@ -378,15 +393,12 @@ impl Vector {
     /// assert_eq!(vector1, Vector::new(vec![0. * 3., 2. * 1., 3. * 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
-    pub fn mul_vec(&mut self, other: &Vector) -> Option<String> {
-        if let Some(err) = check_same_len(self, other) {
-            Some(err)
-        } else {
-            for i in 0..other.len() {
-                self.vec[i] = self.vec[i] * other.vec[i];
-            }
-            None
+    pub fn mul_vec(&mut self, other: &Vector) -> Result<(), String> {
+        check_same_len(self, other)?;
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] * other.vec[i];
         }
+        Ok(())
     }
 
     /// adds each component from the vector with the component of the other vector and stors the result in this vector   
@@ -401,15 +413,12 @@ impl Vector {
     /// assert_eq!(vector1, Vector::new(vec![0. + 3., 2. + 1., 3. + 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
-    pub fn add_vec(&mut self, other: &Vector) -> Option<String> {
-        if let Some(err) = check_same_len(self, other) {
-            Some(err)
-        } else {
-            for i in 0..other.len() {
-                self.vec[i] = self.vec[i] + other.vec[i];
-            }
-            None
+    pub fn add_vec(&mut self, other: &Vector) -> Result<(), String> {
+        check_same_len(self, other)?;
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] + other.vec[i];
         }
+        Ok(())
     }
 
     /// subtracts each component from the vector with the component of the other vector and stors the result in this vector   
@@ -424,15 +433,12 @@ impl Vector {
     /// assert_eq!(vector1, Vector::new(vec![0. - 3., 2. - 1., 3. - 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
-    pub fn sub_vec(&mut self, other: &Vector) -> Option<String> {
-        if let Some(err) = check_same_len(self, other) {
-            Some(err)
-        } else {
-            for i in 0..other.len() {
-                self.vec[i] = self.vec[i] - other.vec[i];
-            }
-            None
+    pub fn sub_vec(&mut self, other: &Vector) -> Result<(), String> {
+        check_same_len(self, other)?;
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] - other.vec[i];
         }
+        Ok(())
     }
 
     /// divides each component from the vector with the component of the other vector and stors the result in this vector   
@@ -447,15 +453,12 @@ impl Vector {
     /// assert_eq!(vector1, Vector::new(vec![0. / 3., 2. / 1., 3. / 3.]));
     /// ```
     /// note it panics if the vectors have not the same len
-    pub fn div_vec(&mut self, other: &Vector) -> Option<String> {
-        if let Some(err) = check_same_len(self, other) {
-            Some(err)
-        } else {
-            for i in 0..other.len() {
-                self.vec[i] = self.vec[i] / other.vec[i];
-            }
-            None
+    pub fn div_vec(&mut self, other: &Vector) -> Result<(), String> {
+        check_same_len(self, other)?;
+        for i in 0..other.len() {
+            self.vec[i] = self.vec[i] / other.vec[i];
         }
+        Ok(())
     }
 
     /// multiplies each component from the vector with a scalar value and stors the result in this vector   
@@ -553,11 +556,8 @@ impl Vector {
     /// assert_eq!(vector.index(1), Ok(3.));
     /// ```  
     pub fn index(&self, index: usize) -> Result<f32, String> {
-        if let Some(err) = in_bouns(index, self.len()) {
-            Err(err)
-        } else {
-            Ok(self.vec[index])
-        }
+        in_bouns(index, self.len())?;
+        Ok(self.vec[index])
     }
 
     /// sets the value of the vector at the specifide index
@@ -570,13 +570,10 @@ impl Vector {
     /// vector.set_index(1, 10.);
     /// assert_eq!(vector.vec(), vec![2.0, 10.0, 5.0]);
     /// ```
-    pub fn set_index(&mut self, index: usize, val: f32) -> Option<String> {
-        if let Some(err) = in_bouns(index, self.len()) {
-            Some(err)
-        } else {
-            self.vec[index] = val;
-            None
-        }
+    pub fn set_index(&mut self, index: usize, val: f32) -> Result<(), String> {
+        in_bouns(index, self.len())?;
+        self.vec[index] = val;
+        Ok(())
     }
 
     /// returns the sum of the elements
@@ -593,26 +590,26 @@ impl Vector {
     }
 }
 
-fn in_bouns(index: usize, len: usize) -> Option<String> {
+fn in_bouns(index: usize, len: usize) -> Result<(), String> {
     if index > len {
-        Some(format!(
+        Err(format!(
             "array out of bouns max len is {} input is {}",
             index, len
         ))
     } else {
-        None
+        Ok(())
     }
 }
 
-fn check_same_len(vec1: &Vector, vec2: &Vector) -> Option<String> {
-    if vec1.vec.len() != vec2.vec.len() {
-        Some(format!(
+fn check_same_len(vec1: &Vector, vec2: &Vector) -> Result<(), String> {
+    if vec1.len() != vec2.len() {
+        Err(format!(
             "the other vector has not the same len self.len() = {}, other.len() = {}",
-            vec1.vec.len(),
-            vec2.vec.len()
+            vec1.len(),
+            vec2.len()
         ))
     } else {
-        None
+        Ok(())
     }
 }
 

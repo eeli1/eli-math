@@ -5,15 +5,22 @@ mod tests {
     #[test]
     fn set_index() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
-        vector.set_index(1, 10.);
+        vector.set_index(1, 10.).unwrap();
         assert_eq!(vector.vec(), vec![2.0, 10.0, 5.0]);
+    }
+
+    #[test]
+    fn dist_sq() {
+        let vector1 = Vector::new(vec![2., 7., 1.]);
+        let vector2 = Vector::new(vec![8., 2., 8.]);
+        assert_eq!(vector1.dist_sq(&vector2), Ok(110.0));
     }
 
     #[test]
     fn dist() {
         let vector1 = Vector::new(vec![2., 7., 1.]);
         let vector2 = Vector::new(vec![8., 2., 8.]);
-        assert_eq!(vector1.dist(&vector2), 10.488089);
+        assert_eq!(vector1.dist(&vector2), Ok(10.488089));
     }
 
     #[test]
@@ -249,14 +256,14 @@ mod tests {
     fn mul_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
-        vector1.mul_vec(&vector2);
+        vector1.mul_vec(&vector2).unwrap();
         assert_eq!(vector1, Vector::new(vec![0. * 3., 2. * 1., 3. * 3.]));
 
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         assert_eq!(
             vector1.mul_vec(&vector2),
-            Some(
+            Err(
                 "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
             )
         );
@@ -266,14 +273,14 @@ mod tests {
     fn add_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
-        vector1.add_vec(&vector2);
+        vector1.add_vec(&vector2).unwrap();
         assert_eq!(vector1, Vector::new(vec![0. + 3., 2. + 1., 3. + 3.]));
 
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         assert_eq!(
             vector1.add_vec(&vector2),
-            Some(
+            Err(
                 "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
             )
         );
@@ -283,14 +290,14 @@ mod tests {
     fn sub_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
-        vector1.sub_vec(&vector2);
+        vector1.sub_vec(&vector2).unwrap();
         assert_eq!(vector1, Vector::new(vec![0. - 3., 2. - 1., 3. - 3.]));
 
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         assert_eq!(
             vector1.sub_vec(&vector2),
-            Some(
+            Err(
                 "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
             )
         );
@@ -300,14 +307,14 @@ mod tests {
     fn div_vec() {
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3.]);
-        vector1.div_vec(&vector2);
+        vector1.div_vec(&vector2).unwrap();
         assert_eq!(vector1, Vector::new(vec![0. / 3., 2. / 1., 3. / 3.]));
 
         let mut vector1 = Vector::new(vec![0., 2., 3.]);
         let vector2 = Vector::new(vec![3., 1., 3., 1.]);
         assert_eq!(
             vector1.div_vec(&vector2),
-            Some(
+            Err(
                 "the other vector has not the same len self.len() = 3, other.len() = 4".to_string()
             )
         );
@@ -335,7 +342,7 @@ mod tests {
 
     #[test]
     fn new_one_hot() {
-        let vector = Vector::new_one_hot(2, 5);
+        let vector = Vector::new_one_hot(2, 5).unwrap();
         assert_eq!(vector.vec(), vec![0.0, 0.0, 1.0, 0.0, 0.0]);
     }
 

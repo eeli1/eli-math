@@ -58,7 +58,7 @@ mod tests {
     fn add_vec() {
         let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let vector = Vector::new(vec![2., 4., 6.]);
-        matrix.add_vec(&vector);
+        matrix.add_vec(&vector).unwrap();
         assert_eq!(
             matrix,
             Matrix::new(vec![vec![4., -3., 1.], vec![6., 0., -1.]]).unwrap()
@@ -66,7 +66,7 @@ mod tests {
 
         matrix.transpose();
         let vector = Vector::new(vec![-2., 6.]);
-        matrix.add_vec(&vector);
+        matrix.add_vec(&vector).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![2., 4., -3., 0., 1., -1.]
@@ -77,15 +77,15 @@ mod tests {
     fn sub_vec() {
         let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let vector = Vector::new(vec![2., 4., 6.]);
-        matrix.sub_vec(&vector);
+        matrix.sub_vec(&vector).unwrap();
         assert_eq!(
             matrix,
-            Matrix::new(vec![vec![0., -3., 1.], vec![-2., 0., -1.]]).unwrap()
+            Matrix::new(vec![vec![0.0, -3.0, 1.0], vec![-2.0, 0.0, -1.0]]).unwrap()
         );
 
         matrix.transpose();
         let vector = Vector::new(vec![-2., 6.]);
-        matrix.sub_vec(&vector);
+        matrix.sub_vec(&vector).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![2., 0., -3., 0., 1., -1.]
@@ -96,7 +96,7 @@ mod tests {
     fn mul_vec() {
         let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let vector = Vector::new(vec![2., 4., 6.]);
-        matrix.mul_vec(&vector);
+        matrix.mul_vec(&vector).unwrap();
         assert_eq!(
             matrix,
             Matrix::new(vec![vec![4., -3., 1.], vec![8., 0., -1.]]).unwrap()
@@ -104,7 +104,7 @@ mod tests {
 
         matrix.transpose();
         let vector = Vector::new(vec![-2., 6.]);
-        matrix.mul_vec(&vector);
+        matrix.mul_vec(&vector).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![-8., -16., -3., 0., 1., -1.]
@@ -115,7 +115,7 @@ mod tests {
     fn div_vec() {
         let mut matrix = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let vector = Vector::new(vec![2., 4., 6.]);
-        matrix.div_vec(&vector);
+        matrix.div_vec(&vector).unwrap();
         assert_eq!(
             matrix,
             Matrix::new(vec![vec![1., -3., 1.], vec![0.5, 0., -1.]]).unwrap()
@@ -123,7 +123,7 @@ mod tests {
 
         matrix.transpose();
         let vector = Vector::new(vec![-2., 6.]);
-        matrix.div_vec(&vector);
+        matrix.div_vec(&vector).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![-0.5, -0.25, -3., 0., 1., -1.]
@@ -134,8 +134,7 @@ mod tests {
     fn add_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
-
-        matrix1.add_mat(&matrix2);
+        matrix1.add_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1,
             Matrix::new(vec![vec![4.0, 0.0, 6.0], vec![9.0, 1.0, 3.0]]).unwrap()
@@ -143,7 +142,7 @@ mod tests {
 
         matrix1.transpose();
         let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]).unwrap();
-        matrix1.add_mat(&matrix2);
+        matrix1.add_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1.matrix_flatt().unwrap().vec(),
             vec![6.0, 5.0, 7.0, 2.0, 3.0, 8.0]
@@ -168,7 +167,7 @@ mod tests {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
 
-        matrix1.sub_mat(&matrix2);
+        matrix1.sub_mat(&matrix2).unwrap();
 
         assert_eq!(
             matrix2.matrix_flatt().unwrap().vec(),
@@ -182,7 +181,7 @@ mod tests {
         matrix1.transpose();
         let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]).unwrap();
 
-        matrix1.sub_mat(&matrix2);
+        matrix1.sub_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1,
             Matrix::new(vec![vec![-2., -1.], vec![-13., -2.], vec![-1., -10.]]).unwrap()
@@ -191,7 +190,7 @@ mod tests {
         let mut matrix1 = Matrix::new_rand(100, 1000);
         let matrix2 = Matrix::new_rand(1000, 100);
         matrix1.transpose();
-        matrix1.sub_mat(&matrix2);
+        matrix1.sub_mat(&matrix2).unwrap();
         assert_eq!(matrix1.cols(), 1000);
         assert_eq!(matrix1.rows(), 100);
     }
@@ -200,8 +199,7 @@ mod tests {
     fn mul_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
-
-        matrix1.mul_mat(&matrix2);
+        matrix1.mul_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1,
             Matrix::new(vec![vec![4.0, -9.0, 5.0], vec![14.0, 0.0, -4.0]]).unwrap()
@@ -209,7 +207,7 @@ mod tests {
 
         matrix1.transpose();
         let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]).unwrap();
-        matrix1.mul_mat(&matrix2);
+        matrix1.mul_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1.matrix_flatt().unwrap().vec(),
             vec![8.0, -56.0, -63.0, 0.0, -15.0, -20.0]
@@ -220,8 +218,7 @@ mod tests {
     fn div_mat() {
         let mut matrix1 = Matrix::new(vec![vec![2., -3., 1.], vec![2., 0., -1.]]).unwrap();
         let matrix2 = Matrix::new(vec![vec![2., 3., 5.], vec![7., 1., 4.]]).unwrap();
-
-        matrix1.div_mat(&matrix2);
+        matrix1.div_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1,
             Matrix::new(vec![vec![1.0, -1.0, 0.2], vec![0.2857143, 0.0, -0.25]]).unwrap()
@@ -229,7 +226,7 @@ mod tests {
 
         matrix1.transpose();
         let matrix2 = Matrix::new(vec![vec![2., -4.], vec![7., 1.], vec![-3., 5.]]).unwrap();
-        matrix1.div_mat(&matrix2);
+        matrix1.div_mat(&matrix2).unwrap();
         assert_eq!(
             matrix1.matrix_flatt().unwrap().vec(),
             vec![0.5, -0.071428575, -0.14285715, 0.0, -0.06666667, -0.05]
@@ -367,7 +364,7 @@ mod tests {
             matrix.matrix_flatt().unwrap().vec(),
             vec![2., 3., 5., 7., 1., 4.]
         );
-        matrix.set_index(0, 1, 10.);
+        matrix.set_index(0, 1, 10.).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![2.0, 10.0, 5.0, 7.0, 1.0, 4.0]
@@ -377,7 +374,7 @@ mod tests {
             matrix.matrix_flatt().unwrap().vec(),
             vec![2.0, 7.0, 10.0, 1.0, 5.0, 4.0]
         );
-        matrix.set_index(0, 1, 10.);
+        matrix.set_index(0, 1, 10.).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
             vec![2.0, 10.0, 10.0, 1.0, 5.0, 4.0]
