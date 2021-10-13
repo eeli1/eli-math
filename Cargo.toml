@@ -6,7 +6,7 @@ resolver = "2"
 version = "0.1.0"
 
 [features]
-default = []
+default = ["gpu"]
 gpu = ["wgpu", "pollster", "bytemuck"]
 
 [dependencies]

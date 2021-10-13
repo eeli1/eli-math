@@ -618,6 +618,51 @@ use std::mem;
 
 #[cfg(feature = "gpu")]
 impl Vector {
+    /// return a vector constructed form bytes
+    ///
+    /// the first 4 byts give the size (as f32) the rest is the conten (also f32)
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Vector;
+    /// let bytes = vec![0, 0, 64, 64, 0, 0, 0, 64, 0, 0, 128, 63, 0, 0, 192, 64];
+    /// let vector = Vector::new_bytes(bytes.clone()).unwrap();
+    /// assert_eq!(vector.vec(), vec![2., 1., 6.]);
+    /// ```
+    pub fn new_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+        let mut vec = Vec::new();
+        if bytes.len() % 4 != 0 {
+            return Err(format!(
+                "bytes.len() have to be divisibel by 4 (the len was {})",
+                bytes.len()
+            ));
+        }
+
+        for i in 0..(bytes.len() / 4) {
+            let byte_4 = [
+                bytes[i * 4 + 0],
+                bytes[i * 4 + 1],
+                bytes[i * 4 + 2],
+                bytes[i * 4 + 3],
+            ];
+            vec.push(f32::from_ne_bytes(byte_4));
+        }
+
+        let size = vec[0];
+        vec.remove(0);
+
+        if size != vec.len() as f32 {
+            return Err(format!(
+                "unexpected size the expected size was {} and the actual size is {}",
+                size,
+                vec.len()
+            ));
+        }
+
+        Ok(Self { vec })
+    }
+
     /// this return a vector of bytes representing the vector
     ///
     /// this is useful for the *GPU* because the interface only uses bytes

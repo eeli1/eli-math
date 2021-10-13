@@ -377,6 +377,28 @@ impl Matrix {
         }
     }
 
+    /*
+    pub fn set_col(&mut self, col: usize, vec: Vector) -> Result<(), String> {
+        if self.cols() < col {
+            return Err(format!("index out of bounds max row {}", self.cols()));
+        }
+        for (i, &val) in vec.vec().iter().enumerate() {
+            self.set_index(i * self.cols() + col, col, val)?;
+        }
+        Ok(())
+    }
+
+    pub fn set_row(&mut self, row: usize, vec: Vector) -> Result<(), String> {
+        if self.rows() < row {
+            return Err(format!("index out of bounds max row {}", self.rows()));
+        }
+        for (i, &val) in vec.vec().iter().enumerate() {
+            self.set_index(row, i * self.rows() + row, val)?;
+        }
+        Ok(())
+    }
+    */
+
     /// returns true if the matrix is a [square matrix]  
     ///
     /// that means if it has as much rows as cols
@@ -939,11 +961,7 @@ fn check_matrix(mat1: &Matrix, mat2: &Matrix) -> Result<(), String> {
 }
 
 #[cfg(feature = "gpu")]
-use crate::random;
-#[cfg(feature = "gpu")]
 use std::mem;
-
-use super::vector;
 
 #[cfg(feature = "gpu")]
 impl Matrix {
@@ -955,14 +973,16 @@ impl Matrix {
     ///
     /// ```rust
     /// use math::linear_algebra::Matrix;
-    /// let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
+    /// let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]).unwrap();
     /// assert_eq!(
     ///     matrix.bytes(),
-    ///     vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64]
+    ///     Ok(vec![
+    ///         0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64
+    ///     ])
     /// );
     /// ```
     /// note the fist and seconde `f32` is the rows and cols of the matrix
-    pub fn bytes(&self) -> Vec<u8> {
+    pub fn bytes(&self) -> Result<Vec<u8>, String> {
         let size = (2 + self.rows() * self.cols()) * mem::size_of::<f32>();
         let mut bytes = Vec::<u8>::with_capacity(size);
 
@@ -974,9 +994,73 @@ impl Matrix {
         }
 
         // `skip(4)` because the first 4 bytes is the len of the vector (f32 = 4bytes)
-        for &b in self.matrix_flatt().bytes().iter().skip(4) {
+        for &b in self
+            .matrix_flatt()?
+            .bytes()
+            .iter()
+            .skip(mem::size_of::<f32>())
+        {
             bytes.push(b);
         }
-        bytes
+        Ok(bytes)
+    }
+
+    ///
+    /// ## Example
+    ///
+    /// ```rust
+    /// use math::linear_algebra::Matrix;
+    /// let bytes = vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64 ];
+    /// let matrix = Matrix::new_bytes(bytes).unwrap();
+    /// assert_eq!(
+    ///     matrix,
+    ///     Matrix::new(vec![vec![2., 3.], vec![7., 4.]]).unwrap()
+    ///  );
+     /// ```
+    pub fn new_bytes(bytes: Vec<u8>) -> Result<Self, String> {
+        let mut vec = Vec::new();
+        if bytes.len() % 4 != 0 {
+            return Err(format!(
+                "bytes.len() have to be divisibel by 4 (the len was {})",
+                bytes.len()
+            ));
+        }
+
+        for i in 0..(bytes.len() / 4) {
+            let byte_4 = [
+                bytes[i * 4 + 0],
+                bytes[i * 4 + 1],
+                bytes[i * 4 + 2],
+                bytes[i * 4 + 3],
+            ];
+            vec.push(f32::from_ne_bytes(byte_4));
+        }
+
+        if vec.len() < 3 {
+            return Err(format!("the len has to be < 3 (the len was {})", vec.len()));
+        }
+
+        let rows = vec[0];
+        vec.remove(0);
+
+        let cols = vec[0];
+        vec.remove(0);
+
+        let size = cols * rows;
+
+        if size != vec.len() as f32 {
+            return Err(format!(
+                "unexpected size the expected size was {} and the actual size is {}",
+                size,
+                vec.len()
+            ));
+        }
+
+        Ok(Self {
+            rows: rows as usize,
+            cols: cols as usize,
+            matrix_flatt: Vector::new(vec),
+            is_transpose: false,
+        })
     }
 }

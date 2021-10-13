@@ -2,6 +2,25 @@
 mod tests {
     use math::linear_algebra::Vector;
 
+    #[cfg(feature = "gpu")]
+    #[test]
+    fn bytes_vec() {
+        let vector = Vector::new(vec![2., 1., 6.]);
+        assert_eq!(
+            vector.bytes(),
+            vec![0, 0, 64, 64, 0, 0, 0, 64, 0, 0, 128, 63, 0, 0, 192, 64]
+        );
+    }
+
+    #[cfg(feature = "gpu")]
+    #[test]
+    fn new_bytes() {
+        let bytes = vec![0, 0, 64, 64, 0, 0, 0, 64, 0, 0, 128, 63, 0, 0, 192, 64];
+        let vector = Vector::new_bytes(bytes.clone()).unwrap();
+        assert_eq!(vector.vec(), vec![2., 1., 6.]);
+        assert_eq!(vector.bytes(), bytes);
+    }
+
     #[test]
     fn set_index() {
         let mut vector = Vector::new(vec![2., 3., 5.]);
@@ -162,16 +181,6 @@ mod tests {
         let vector1 = Vector::new(vec![1., 0., 0.]);
         let vector2 = Vector::new(vec![0., 1., 0.]);
         assert_eq!(vector1.rot(&vector2), Ok(1.5707964));
-    }
-
-    #[cfg(feature = "gpu")]
-    #[test]
-    fn bytes_vec() {
-        let vector = Vector::new(vec![2., 1., 6.]);
-        assert_eq!(
-            vector.bytes(),
-            vec![0, 0, 64, 64, 0, 0, 0, 64, 0, 0, 128, 63, 0, 0, 192, 64]
-        );
     }
 
     #[test]

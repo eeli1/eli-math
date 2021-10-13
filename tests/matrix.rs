@@ -46,7 +46,7 @@ mod tests {
     }
 
     #[test]
-    fn name() {
+    fn new_flatt() {
         let matrix = Matrix::new_flatt(vec![3., 2., 4., 4., 5., 6.], 2, 3).unwrap();
         assert_eq!(
             matrix.matrix_flatt().unwrap().vec(),
@@ -475,10 +475,32 @@ mod tests {
     #[cfg(feature = "gpu")]
     #[test]
     fn bytes() {
-        let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]);
+        let matrix = Matrix::new(vec![vec![2., 3.], vec![7., 4.]]).unwrap();
         assert_eq!(
             matrix.bytes(),
-            vec![0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64]
+            Ok(vec![
+                0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64
+            ])
+        );
+    }
+
+    #[cfg(feature = "gpu")]
+    #[test]
+    fn new_bytes() {
+        let bytes = vec![
+            0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64,
+        ];
+        let matrix = Matrix::new_bytes(bytes).unwrap();
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![2., 3.], vec![7., 4.]]).unwrap()
+        );
+
+        assert_eq!(
+            matrix.bytes(),
+            Ok(vec![
+                0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 0, 64, 0, 0, 64, 64, 0, 0, 224, 64, 0, 0, 128, 64
+            ])
         );
     }
 
@@ -663,6 +685,28 @@ mod tests {
         let matrix = Matrix::new(vec![vec![3., 1.], vec![5., 3.]]).unwrap();
         assert_eq!(matrix.sum_vec(), Ok(Vector::new(vec![8.0, 4.0])));
     }
+
+    /*
+    #[test]
+    fn set_col() {
+        let mut matrix = Matrix::new(vec![vec![2., 5., 7.], vec![6., 4., 3.]]).unwrap();
+        matrix.set_col(1, Vector::new(vec![2., 1., 6.])).unwrap();
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![2., 5., 7.], vec![2., 1., 6.]]).unwrap()
+        );
+    }
+
+    #[test]
+    fn set_row() {
+        let mut matrix = Matrix::new(vec![vec![2., 5., 7.], vec![6., 4., 3.]]).unwrap();
+        matrix.set_row(1, Vector::new(vec![2., 1.])).unwrap();
+        assert_eq!(
+            matrix,
+            Matrix::new(vec![vec![2., 2., 7.], vec![6., 1., 3.]]).unwrap()
+        );
+    }
+    */
 
     #[test]
     fn fmt() {
