@@ -2,6 +2,9 @@ pub mod linear_algebra;
 pub mod misc;
 pub mod random;
 
+#[cfg(feature = "gpu")]
+pub mod gpu;
+
 #[cfg(test)]
 mod tests {
     // use super::*;
